@@ -5,7 +5,33 @@
     {
       "type": "npm",
       "script": "start",
+      "label": "npm: start - shell",
       "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "(.*?)"
+          },
+          "endsPattern": {
+            "regexp": "bundle generation complete"
+          }
+        }
+      }
+    },
+    {
+      "type": "npm",
+      "script": "start:remote",
+      "label": "npm: start:remote - playerLandingPage",
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "problemMatcher": {
         "owner": "typescript",
         "pattern": "$tsc",
