@@ -1,92 +1,133 @@
 <div class="min-h-screen bg-bg-primary transition-colors duration-300 flex flex-col">
-  <!-- Mobile-First Header -->
-  <header class="bg-bg-secondary border-b border-border sticky top-0 z-50">
+  <!-- Enhanced Mobile-First Header -->
+  <header class="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 border-b border-purple-500/20 sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <!-- Logo/Brand -->
-        <div class="flex items-center">
-          <div class="text-xl sm:text-2xl font-bold text-text-primary text-glow">
-            🏟️ <span class="hidden sm:inline">Top Dog Arena</span>
-            <span class="sm:hidden">TDA</span>
+      <div class="flex items-center justify-between h-16 lg:h-20">
+        <!-- Enhanced Logo/Brand -->
+        <div class="flex items-center group">
+          <div class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent drop-shadow-lg transition-all duration-300 group-hover:scale-105">
+            🏟️ <span class="hidden sm:inline font-extrabold tracking-tight">Top Dog Arena</span>
+            <span class="sm:hidden font-extrabold">TDA</span>
+          </div>
+          <div class="hidden lg:block ml-3 text-xs text-purple-300 font-medium">
+            The Ultimate Arena
           </div>
         </div>
 
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:flex space-x-8">
+        <!-- Enhanced Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-1">
           <a routerLink="/" 
-             class="text-text-secondary hover:text-tda-primary-500 transition-colors font-medium px-3 py-2 rounded-md text-sm">
-            🏠 Home
+             class="relative group px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-all duration-300 rounded-lg hover:bg-white/10 backdrop-blur-sm">
+            <span class="flex items-center space-x-2">
+              <span class="text-lg">🏠</span>
+              <span>Home</span>
+            </span>
+            <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </a>
           <a routerLink="/player-landing-page" 
-             class="text-text-secondary hover:text-tda-primary-500 transition-colors font-medium px-3 py-2 rounded-md text-sm">
-            🎮 Player Hub
+             class="relative group px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-all duration-300 rounded-lg hover:bg-white/10 backdrop-blur-sm">
+            <span class="flex items-center space-x-2">
+              <span class="text-lg">🎮</span>
+              <span>Player Hub</span>
+            </span>
+            <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </a>
           <a routerLink="/tournaments" 
-             class="text-text-secondary hover:text-tda-primary-500 transition-colors font-medium px-3 py-2 rounded-md text-sm">
-            🏆 Tournaments
+             class="relative group px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-all duration-300 rounded-lg hover:bg-white/10 backdrop-blur-sm">
+            <span class="flex items-center space-x-2">
+              <span class="text-lg">🏆</span>
+              <span>Tournaments</span>
+            </span>
+            <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </a>
           <a routerLink="/leaderboard" 
-             class="text-text-secondary hover:text-tda-primary-500 transition-colors font-medium px-3 py-2 rounded-md text-sm">
-            📊 Leaderboard
+             class="relative group px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-all duration-300 rounded-lg hover:bg-white/10 backdrop-blur-sm">
+            <span class="flex items-center space-x-2">
+              <span class="text-lg">📊</span>
+              <span>Leaderboard</span>
+            </span>
+            <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
           </a>
+          
+          <!-- CTA Button -->
+          <div class="ml-4 pl-4 border-l border-purple-500/30">
+            <a routerLink="/player-landing-page" 
+               class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-bold rounded-full hover:from-orange-600 hover:to-red-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-orange-500/25">
+              <span class="mr-2">🚀</span>
+              Join Arena
+            </a>
+          </div>
         </nav>
 
-        <!-- Mobile menu button -->
+        <!-- Enhanced Mobile menu button -->
         <div class="md:hidden">
           <button type="button" 
                   (click)="toggleMobileMenu()"
-                  class="text-text-secondary hover:text-text-primary inline-flex items-center justify-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-tda-primary-500"
+                  class="relative group p-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300"
                   aria-controls="mobile-menu" 
                   [attr.aria-expanded]="isMobileMenuOpen()">
             <span class="sr-only">Open main menu</span>
-            <!-- Hamburger icon -->
-            <svg class="h-6 w-6" 
-                 [class.hidden]="isMobileMenuOpen()" 
-                 xmlns="http://www.w3.org/2000/svg" 
-                 fill="none" 
-                 viewBox="0 0 24 24" 
-                 stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            <!-- Close icon -->
-            <svg class="h-6 w-6" 
-                 [class.hidden]="!isMobileMenuOpen()" 
-                 xmlns="http://www.w3.org/2000/svg" 
-                 fill="none" 
-                 viewBox="0 0 24 24" 
-                 stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <!-- Enhanced Hamburger icon -->
+            <div class="relative w-6 h-6">
+              <span class="absolute block w-6 h-0.5 bg-current transform transition-all duration-300 ease-in-out"
+                    [class.rotate-45]="isMobileMenuOpen()"
+                    [class.translate-y-2]="isMobileMenuOpen()"
+                    [class.-translate-y-1.5]="!isMobileMenuOpen()"></span>
+              <span class="absolute block w-6 h-0.5 bg-current transform transition-all duration-300 ease-in-out"
+                    [class.opacity-0]="isMobileMenuOpen()"
+                    [class.translate-y-0.5]="!isMobileMenuOpen()"></span>
+              <span class="absolute block w-6 h-0.5 bg-current transform transition-all duration-300 ease-in-out"
+                    [class.-rotate-45]="isMobileMenuOpen()"
+                    [class.-translate-y-2]="isMobileMenuOpen()"
+                    [class.translate-y-2.5]="!isMobileMenuOpen()"></span>
+            </div>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Mobile Navigation Menu -->
-    <div class="md:hidden" 
+    <!-- Enhanced Mobile Navigation Menu -->
+    <div class="md:hidden transition-all duration-300 ease-in-out overflow-hidden" 
          id="mobile-menu" 
-         [class.hidden]="!isMobileMenuOpen()">
-      <div class="px-2 pt-2 pb-3 space-y-1 bg-bg-secondary border-t border-border">
+         [class.max-h-0]="!isMobileMenuOpen()"
+         [class.max-h-96]="isMobileMenuOpen()"
+         [class.opacity-0]="!isMobileMenuOpen()"
+         [class.opacity-100]="isMobileMenuOpen()">
+      <div class="px-4 pt-4 pb-6 space-y-2 bg-gradient-to-b from-slate-900/95 to-purple-900/95 backdrop-blur-md border-t border-purple-500/20">
         <a routerLink="/" 
            (click)="closeMobileMenu()"
-           class="text-text-secondary hover:text-tda-primary-500 block px-3 py-2 rounded-md text-base font-medium transition-colors">
-          🏠 Home
+           class="group flex items-center space-x-3 px-4 py-3 text-base font-semibold text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">🏠</span>
+          <span>Home</span>
         </a>
         <a routerLink="/player-landing-page" 
            (click)="closeMobileMenu()"
-           class="text-text-secondary hover:text-tda-primary-500 block px-3 py-2 rounded-md text-base font-medium transition-colors">
-          🎮 Player Hub
+           class="group flex items-center space-x-3 px-4 py-3 text-base font-semibold text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">🎮</span>
+          <span>Player Hub</span>
         </a>
         <a routerLink="/tournaments" 
            (click)="closeMobileMenu()"
-           class="text-text-secondary hover:text-tda-primary-500 block px-3 py-2 rounded-md text-base font-medium transition-colors">
-          🏆 Tournaments
+           class="group flex items-center space-x-3 px-4 py-3 text-base font-semibold text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">🏆</span>
+          <span>Tournaments</span>
         </a>
         <a routerLink="/leaderboard" 
            (click)="closeMobileMenu()"
-           class="text-text-secondary hover:text-tda-primary-500 block px-3 py-2 rounded-md text-base font-medium transition-colors">
-          📊 Leaderboard
+           class="group flex items-center space-x-3 px-4 py-3 text-base font-semibold text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">📊</span>
+          <span>Leaderboard</span>
         </a>
+        
+        <!-- Mobile CTA -->
+        <div class="pt-4 mt-4 border-t border-purple-500/30">
+          <a routerLink="/player-landing-page" 
+             (click)="closeMobileMenu()"
+             class="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white text-base font-bold rounded-lg hover:from-orange-600 hover:to-red-700 transform hover:scale-105 transition-all duration-300 shadow-lg">
+            <span>�</span>
+            <span>Join the Arena</span>
+          </a>
+        </div>
       </div>
     </div>
   </header>

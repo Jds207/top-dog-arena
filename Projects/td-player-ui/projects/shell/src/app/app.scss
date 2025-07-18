@@ -1,8 +1,57 @@
-/* Mobile-First Responsive Styles */
+/* Mobile-First Responsive Styles with Enhanced Gaming Theme */
 
-/* Smooth transitions for mobile menu */
-.mobile-menu-transition {
-  transition: all 0.3s ease-in-out;
+/* Custom gradient animations */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Header enhancements */
+header {
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(-45deg, #1e1b4b, #581c87, #7c2d12, #991b1b);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+/* Enhanced text glow effects */
+.text-glow {
+  text-shadow: 
+    0 0 5px rgba(249, 115, 22, 0.5),
+    0 0 10px rgba(249, 115, 22, 0.3),
+    0 0 15px rgba(249, 115, 22, 0.2),
+    0 0 20px rgba(249, 115, 22, 0.1);
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #f97316, #dc2626);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #ea580c, #b91c1c);
 }
 
 /* Ensure proper spacing on mobile */
@@ -18,27 +67,31 @@
     display: flex;
     align-items: center;
   }
+
+  /* Enhanced mobile menu animation */
+  .mobile-menu-enter {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  
+  .mobile-menu-enter-active {
+    transform: translateY(0);
+    opacity: 1;
+    transition: all 0.3s ease-out;
+  }
 }
 
 /* Enhanced focus states for accessibility */
-.nav-link:focus {
-  outline: 2px solid theme('colors.tda.primary.500');
+.nav-link:focus-visible {
+  outline: 2px solid #f97316;
   outline-offset: 2px;
+  border-radius: 6px;
 }
 
 /* Improved mobile menu animation */
 #mobile-menu {
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-}
-
-#mobile-menu.hidden {
-  opacity: 0;
-  visibility: hidden;
-}
-
-#mobile-menu:not(.hidden) {
-  opacity: 1;
-  visibility: visible;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
 }
 
 /* Better footer spacing on mobile */
@@ -69,40 +122,66 @@
   }
 }
 
-/* Sticky header improvements */
-header.sticky {
-  backdrop-filter: blur(8px);
-  background-color: rgba(var(--bg-secondary-rgb), 0.95);
-  
-  @supports not (backdrop-filter: blur(8px)) {
-    background-color: var(--bg-secondary);
-  }
-}
-
-/* Enhanced text glow effect */
-.text-glow {
-  text-shadow: 0 0 10px rgba(var(--tda-primary-500-rgb), 0.5);
+/* Enhanced button hover effects */
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
 }
 
 /* Smooth hover transitions */
-a {
-  transition: color 0.2s ease-in-out;
+a, button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Loading state for router-outlet */
 router-outlet + * {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes fadeIn {
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Gaming-style pulse animation for important elements */
+.pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from {
+    text-shadow: 0 0 5px rgba(249, 115, 22, 0.5);
+  }
+  to {
+    text-shadow: 
+      0 0 10px rgba(249, 115, 22, 0.8),
+      0 0 20px rgba(249, 115, 22, 0.4),
+      0 0 30px rgba(249, 115, 22, 0.2);
+  }
+}
+
+/* Improved backdrop blur for better browser support */
+.backdrop-blur-enhanced {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  
+  @supports not (backdrop-filter: blur(12px)) {
+    background: rgba(15, 23, 42, 0.9);
+  }
+}
+
+/* Enhanced card hover effects */
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(249, 115, 22, 0.1);
 }
 
 /* Print styles */
@@ -116,5 +195,28 @@ router-outlet + * {
   main {
     margin: 0;
     padding: 0;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .text-glow {
+    text-shadow: none;
+  }
+  
+  .bg-gradient-to-r {
+    background: #000;
+    color: #fff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
