@@ -5,6 +5,7 @@ This folder contains project-wide documentation and architectural planning docum
 ## Contents
 
 - **SUBDOMAIN_STRATEGY.md** - Planned subdomain architecture for the platform
+- **AI_CODING_GUIDELINES.md** - Comprehensive coding standards and defensive programming practices for AI assistants
 - *Additional documentation files will be added here as the project evolves*
 
 ## Purpose
@@ -14,6 +15,7 @@ This documentation folder serves as a central repository for:
 - System design documents
 - Project specifications
 - Technical documentation that spans multiple components
+- Coding standards and best practices
 
 ---
 
