@@ -14,11 +14,7 @@ import { LocalLandingPageComponent } from './local-landing-page.component';
   selector: 'app-remote-wrapper',
   standalone: true,
   imports: [CommonModule, LocalLandingPageComponent],
-  template: `
-    <div #container>
-      <app-local-landing-page *ngIf="!isRemoteLoaded"></app-local-landing-page>
-    </div>
-  `,
+  templateUrl: './remote-wrapper.component.html',
 })
 export class RemoteWrapperComponent implements OnInit {
   isRemoteLoaded = false;

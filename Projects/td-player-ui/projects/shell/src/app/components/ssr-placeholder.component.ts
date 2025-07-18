@@ -5,15 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-ssr-placeholder',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="placeholder">
-      <h3>Loading Player Landing Page...</h3>
-      <p>
-        This content will be loaded when the page is fully rendered in the
-        browser.
-      </p>
-    </div>
-  `,
+  templateUrl: './ssr-placeholder.component.html',
   styles: [
     `
       .placeholder {

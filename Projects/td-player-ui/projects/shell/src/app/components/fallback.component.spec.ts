@@ -15,17 +15,17 @@ class MockHomeComponent { }
 describe('FallbackComponent', () => {
   let component: FallbackComponent;
   let fixture: ComponentFixture<FallbackComponent>;
-  let router: jasmine.SpyObj<Router>;
-  let consoleSpy: jasmine.Spy;
+  let router: jest.Mocked<Router>;
+  let consoleSpy: jest.SpyInstance;
   let mockLocation: any;
 
   beforeEach(async () => {
-    // Create router spy
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'], {
+    // Create router mock
+    const routerMock = {
+      navigate: jest.fn().mockResolvedValue(true),
+      navigateByUrl: jest.fn().mockResolvedValue(true),
       url: '/test-url'
-    });
-    routerSpy.navigate.and.returnValue(Promise.resolve(true));
-    routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -33,21 +33,21 @@ describe('FallbackComponent', () => {
         NoopAnimationsModule
       ],
       providers: [
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerMock }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FallbackComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    router = TestBed.inject(Router) as jest.Mocked<Router>;
 
     // Set up console spy
-    consoleSpy = spyOn(console, 'warn');
+    consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
     
     // Create mock location for tests that need it
     mockLocation = {
       href: '',
-      reload: jasmine.createSpy('reload')
+      reload: jest.fn()
     };
     
     fixture.detectChanges();
@@ -71,7 +71,7 @@ describe('FallbackComponent', () => {
     });
 
     it('should log initialization message on ngOnInit', () => {
-      const logSpy = spyOn(console, 'log');
+      const logSpy = jest.spyOn(console, 'log').mockImplementation();
       component.ngOnInit();
       expect(logSpy).toHaveBeenCalledWith(
         'FallbackComponent initialized for route:', 
@@ -98,7 +98,7 @@ describe('FallbackComponent', () => {
   describe('Navigation Methods', () => {
     describe('navigateToHome()', () => {
       it('should navigate to home successfully', async () => {
-        const logSpy = spyOn(console, 'log');
+        const logSpy = jest.spyOn(console, 'log').mockImplementation();
 
         await component.navigateToHome();
 
@@ -108,9 +108,9 @@ describe('FallbackComponent', () => {
       });
 
       it('should handle failed navigation with fallback', async () => {
-        router.navigate.and.returnValue(Promise.resolve(false));
-        const consoleErrorSpy = spyOn(console, 'error');
-        const locationSpy = spyOn(component as any, 'fallbackNavigation');
+        router.navigate.mockResolvedValue(false);
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+        const locationSpy = jest.spyOn(component as any, 'fallbackNavigation').mockImplementation();
         
         await component.navigateToHome();
         

@@ -1,0 +1,64 @@
+<div class="theme-selector">
+  <div class="theme-selector-header">
+    <h3 class="theme-title">🎨 Choose Your Arena Theme</h3>
+    <p class="theme-description">Customize your Top Dog Arena experience</p>
+  </div>
+  
+  <div class="theme-grid">
+    <button
+      *ngFor="let theme of availableThemes()"
+      (click)="selectTheme(theme.id)"
+      [class.active]="isActive(theme.id)"
+      [attr.aria-label]="'Switch to ' + theme.name + ' theme'"
+      class="theme-option"
+      type="button"
+    >
+      <div class="theme-preview" [attr.data-theme]="theme.id">
+        <span class="theme-icon">{{ theme.icon }}</span>
+        <div class="theme-colors">
+          <div class="color-sample primary"></div>
+          <div class="color-sample secondary"></div>
+          <div class="color-sample accent"></div>
+        </div>
+      </div>
+      
+      <div class="theme-info">
+        <h4 class="theme-name">{{ theme.name }}</h4>
+        <p class="theme-desc">{{ theme.description }}</p>
+      </div>
+      
+      <div class="active-indicator" *ngIf="isActive(theme.id)">
+        ✓ Active
+      </div>
+    </button>
+  </div>
+  
+  <div class="theme-actions">
+    <button 
+      (click)="toggleDarkMode()" 
+      class="btn-secondary"
+      type="button"
+      [attr.aria-label]="'Toggle between light and dark mode'"
+    >
+      {{ isDarkMode() ? '☀️' : '🌙' }} Toggle Dark Mode
+    </button>
+    
+    <button 
+      (click)="cycleTheme()" 
+      class="btn-primary"
+      type="button"
+      [attr.aria-label]="'Cycle through all themes'"
+    >
+      🔄 Cycle Themes
+    </button>
+    
+    <button 
+      (click)="resetTheme()" 
+      class="btn-danger"
+      type="button"
+      [attr.aria-label]="'Reset to default theme'"
+    >
+      🔄 Reset
+    </button>
+  </div>
+</div>
