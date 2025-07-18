@@ -1,38 +1,66 @@
 <div class="fallback">
-  <h3>Unable to Load Player Landing Page</h3>
-  <p>The remote module could not be loaded. This might be because:</p>
-  <ul>
-    <li>The remote application is not running</li>
-    <li>Network connectivity issues</li>
-    <li>Configuration problems</li>
-  </ul>
-  <p>
-    Please ensure the Player Landing Page application is running on port 4201.
-  </p>
+  <div class="text-center mb-6">
+    <h3 class="text-2xl font-bold text-tda-error-600 dark:text-tda-error-400 mb-3 text-glow">
+      ⚠️ Loading Problem
+    </h3>
+    <p class="text-text-secondary text-lg mb-4">
+      The remote module could not be loaded. This might be because:
+    </p>
+  </div>
+  
+  <div class="bg-bg-tertiary border border-border-light rounded-lg p-4 mb-6">
+    <ul class="space-y-2 text-text-secondary">
+      <li class="flex items-center gap-2">
+        <span class="text-tda-error-500">•</span>
+        The remote application is not running
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="text-tda-error-500">•</span>
+        Network connectivity issues
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="text-tda-error-500">•</span>
+        Configuration problems
+      </li>
+    </ul>
+  </div>
+  
+  <div class="bg-tda-primary-50 dark:bg-tda-primary-900/20 border border-tda-primary-200 dark:border-tda-primary-800 rounded-lg p-4 mb-6">
+    <p class="text-tda-primary-700 dark:text-tda-primary-300 text-sm">
+      💡 <strong>Tip:</strong> Please ensure the Player Landing Page application is running on port 4201.
+    </p>
+  </div>
   
   @if (errorDetails) {
     <div class="error-details">
-      <h4>Error Details:</h4>
-      <p class="error-message">{{ errorDetails }}</p>
+      <h4 class="text-tda-error-600 dark:text-tda-error-400 text-lg font-semibold mb-2 flex items-center gap-2">
+        🔍 Error Details:
+      </h4>
+      <div class="error-message font-mono text-sm text-text-secondary bg-bg-tertiary p-3 rounded border border-border-light">
+        {{ errorDetails }}
+      </div>
     </div>
   }
   
-  <div class="action-buttons">
+  <div class="action-buttons flex gap-4 mt-6 flex-wrap justify-center">
     <button 
       (click)="navigateToHome()" 
-      class="back-button"
+      class="back-button btn-primary min-w-32 flex items-center gap-2"
       [disabled]="isNavigating"
       [attr.aria-label]="'Navigate back to home page'"
     >
-      {{ isNavigating ? 'Navigating...' : 'Back to Home' }}
+      <span>🏠</span>
+      {{ isNavigating ? 'Navigating...' : 'Go Back to Home' }}
     </button>
     
     <button 
       (click)="retryLoading()" 
-      class="retry-button"
+      class="retry-button btn-success min-w-32 flex items-center gap-2"
+      [disabled]="isNavigating"
       [attr.aria-label]="'Retry loading the remote module'"
     >
-      Retry Loading
+      <span>🔄</span>
+      {{ isNavigating ? 'Loading...' : 'Try Again' }}
     </button>
   </div>
 </div>

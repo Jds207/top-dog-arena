@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Top Dog Arena Global Styles with Theme Support */
+
+@layer base {
+  /* Light Theme (default) */
+  :root {
+    --color-bg-primary: 255 255 255;
+    --color-bg-secondary: 248 250 252;
+    --color-bg-tertiary: 241 245 249;
+    --color-text-primary: 15 23 42;
+    --color-text-secondary: 71 85 105;
+    --color-text-muted: 148 163 184;
+    --color-border: 226 232 240;
+    --color-border-light: 241 245 249;
+    --shadow-color: 0 0 0;
+  }
+
+  /* Dark Theme */
+  .dark {
+    --color-bg-primary: 15 23 42;
+    --color-bg-secondary: 30 41 59;
+    --color-bg-tertiary: 51 65 85;
+    --color-text-primary: 248 250 252;
+    --color-text-secondary: 203 213 225;
+    --color-text-muted: 148 163 184;
+    --color-border: 71 85 105;
+    --color-border-light: 51 65 85;
+    --shadow-color: 0 0 0;
+  }
+
+  /* Gaming Theme */
+  .theme-gaming {
+    --color-bg-primary: 0 0 0;
+    --color-bg-secondary: 17 24 39;
+    --color-bg-tertiary: 31 41 55;
+    --color-text-primary: 34 197 94;
+    --color-text-secondary: 74 222 128;
+    --color-text-muted: 134 239 172;
+    --color-border: 16 185 129;
+    --color-border-light: 52 211 153;
+    --shadow-color: 34 197 94;
+  }
+
+  /* Arena Theme */
+  .theme-arena {
+    --color-bg-primary: 127 29 29;
+    --color-bg-secondary: 153 27 27;
+    --color-bg-tertiary: 185 28 28;
+    --color-text-primary: 254 226 226;
+    --color-text-secondary: 248 113 113;
+    --color-text-muted: 239 68 68;
+    --color-border: 220 38 38;
+    --color-border-light: 248 113 113;
+    --shadow-color: 220 38 38;
+  }
+
+  /* Neon Theme */
+  .theme-neon {
+    --color-bg-primary: 3 7 18;
+    --color-bg-secondary: 15 23 42;
+    --color-bg-tertiary: 30 41 59;
+    --color-text-primary: 147 51 234;
+    --color-text-secondary: 196 181 253;
+    --color-text-muted: 168 85 247;
+    --color-border: 124 58 237;
+    --color-border-light: 147 51 234;
+    --shadow-color: 147 51 234;
+  }
+
+  body {
+    @apply bg-bg-primary text-text-primary transition-colors duration-300;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold text-text-primary;
+  }
+}
+
+@layer components {
+  /* Theme-aware utilities */
+  .bg-bg-primary {
+    background-color: rgb(var(--color-bg-primary));
+  }
+  
+  .bg-bg-secondary {
+    background-color: rgb(var(--color-bg-secondary));
+  }
+  
+  .bg-bg-tertiary {
+    background-color: rgb(var(--color-bg-tertiary));
+  }
+  
+  .text-text-primary {
+    color: rgb(var(--color-text-primary));
+  }
+  
+  .text-text-secondary {
+    color: rgb(var(--color-text-secondary));
+  }
+  
+  .text-text-muted {
+    color: rgb(var(--color-text-muted));
+  }
+  
+  .border-border {
+    border-color: rgb(var(--color-border));
+  }
+  
+  .border-border-light {
+    border-color: rgb(var(--color-border-light));
+  }
+
+  /* Component styles */
+  .btn-primary {
+    @apply bg-tda-primary-500 hover:bg-tda-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-tda-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply bg-tda-secondary-500 hover:bg-tda-secondary-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-tda-secondary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-success {
+    @apply bg-tda-accent-500 hover:bg-tda-accent-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-tda-accent-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-danger {
+    @apply bg-tda-error-500 hover:bg-tda-error-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-tda-error-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .card {
+    @apply bg-bg-secondary border border-border rounded-xl shadow-lg p-6 transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-xl hover:scale-105;
+  }
+
+  .fallback-card {
+    @apply card bg-tda-error-50 border-tda-error-200 dark:bg-tda-error-900/20 dark:border-tda-error-800;
+  }
+
+  .error-details {
+    @apply bg-bg-tertiary border border-border-light rounded-lg p-4 my-4;
+  }
+
+  .theme-gaming .card {
+    box-shadow: 0 4px 20px rgba(var(--shadow-color), 0.3);
+  }
+
+  .theme-arena .card {
+    box-shadow: 0 4px 20px rgba(var(--shadow-color), 0.4);
+  }
+
+  .theme-neon .card {
+    box-shadow: 0 4px 20px rgba(var(--shadow-color), 0.5);
+    border: 1px solid rgba(var(--shadow-color), 0.3);
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 10px rgba(var(--shadow-color), 0.7);
+  }
+
+  .theme-gaming .text-glow {
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+  }
+
+  .theme-arena .text-glow {
+    text-shadow: 0 0 10px rgba(220, 38, 38, 0.7);
+  }
+
+  .theme-neon .text-glow {
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.7);
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-glow {
+    from {
+      text-shadow: 0 0 5px rgba(var(--shadow-color), 0.5);
+    }
+    to {
+      text-shadow: 0 0 20px rgba(var(--shadow-color), 1);
+    }
+  }
+}
