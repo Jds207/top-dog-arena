@@ -1,53 +1,95 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
+/**
+ * Fallback component displayed when remote module federation loading fails.
+ * Provides user-friendly error messaging and navigation options.
+ */
 @Component({
   selector: 'app-fallback',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  template: `
-    <div class="fallback">
-      <h3>Unable to Load Player Landing Page</h3>
-      <p>The remote module could not be loaded. This might be because:</p>
-      <ul>
-        <li>The remote application is not running</li>
-        <li>Network connectivity issues</li>
-        <li>Configuration problems</li>
-      </ul>
-      <p>
-        Please ensure the Player Landing Page application is running on port
-        4201.
-      </p>
-      <button routerLink="/" class="back-button">Back to Home</button>
-    </div>
-  `,
-  styles: [
-    `
-      .fallback {
-        padding: 2rem;
-        background-color: #fee;
-        border: 1px solid #fcc;
-        border-radius: 8px;
-        margin: 1rem;
-      }
-
-      .back-button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 1rem;
-      }
-
-      .back-button:hover {
-        background-color: #0056b3;
-      }
-    `,
-  ],
+  templateUrl: './fallback.component.html',
+  styleUrls: ['./fallback.component.scss'],
 })
-export class FallbackComponent {}
+export class FallbackComponent implements OnInit {
+  private readonly router = inject(Router);
+
+  /**
+   * Error details that can be passed to the component for better debugging
+   */
+  errorDetails?: string;
+
+  /**
+   * Flag to track if navigation is in progress
+   */
+  isNavigating = false;
+
+  ngOnInit(): void {
+    // Log fallback component activation for debugging
+    console.warn('Fallback component activated - Remote module loading failed');
+  }
+
+  /**
+   * Navigates back to home with error handling
+   * Provides defensive navigation with fallback options
+   */
+  navigateToHome(): void {
+    if (this.isNavigating) {
+      return; // Prevent double navigation
+    }
+
+    this.isNavigating = true;
+
+    try {
+      this.router.navigate(['/']).then(
+        (success: boolean) => {
+          if (!success) {
+            console.error('Navigation to home failed');
+            // Fallback: use browser navigation
+            window.location.href = '/';
+          }
+        }
+      ).catch((error: unknown) => {
+        console.error('Navigation error:', error);
+        // Fallback: use browser navigation
+        window.location.href = '/';
+      }).finally(() => {
+        this.isNavigating = false;
+      });
+    } catch (error) {
+      console.error('Unexpected navigation error:', error);
+      this.isNavigating = false;
+      // Ultimate fallback: use browser navigation
+      window.location.href = '/';
+    }
+  }
+
+  /**
+   * Attempts to reload the page to retry module loading
+   */
+  retryLoading(): void {
+    try {
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to reload page:', error);
+      // Fallback: navigate to current route
+      this.router.navigateByUrl(this.router.url);
+    }
+  }
+
+  /**
+   * Sets error details for debugging purposes
+   * @param details - Error details string
+   */
+  setErrorDetails(details: string | unknown): void {
+    if (typeof details === 'string') {
+      this.errorDetails = details;
+    } else if (details instanceof Error) {
+      this.errorDetails = details.message;
+    } else {
+      this.errorDetails = 'Unknown error occurred';
+    }
+  }
+}

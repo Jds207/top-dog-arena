@@ -1,0 +1,38 @@
+<div class="fallback">
+  <h3>Unable to Load Player Landing Page</h3>
+  <p>The remote module could not be loaded. This might be because:</p>
+  <ul>
+    <li>The remote application is not running</li>
+    <li>Network connectivity issues</li>
+    <li>Configuration problems</li>
+  </ul>
+  <p>
+    Please ensure the Player Landing Page application is running on port 4201.
+  </p>
+  
+  @if (errorDetails) {
+    <div class="error-details">
+      <h4>Error Details:</h4>
+      <p class="error-message">{{ errorDetails }}</p>
+    </div>
+  }
+  
+  <div class="action-buttons">
+    <button 
+      (click)="navigateToHome()" 
+      class="back-button"
+      [disabled]="isNavigating"
+      [attr.aria-label]="'Navigate back to home page'"
+    >
+      {{ isNavigating ? 'Navigating...' : 'Back to Home' }}
+    </button>
+    
+    <button 
+      (click)="retryLoading()" 
+      class="retry-button"
+      [attr.aria-label]="'Retry loading the remote module'"
+    >
+      Retry Loading
+    </button>
+  </div>
+</div>
