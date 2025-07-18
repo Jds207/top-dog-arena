@@ -1,0 +1,37 @@
+Top Dog Arena - To-Do List
+===========================
+
+Date: July 17, 2025
+
+High Priority
+-------------
+- [ ] Design paper cards
+- [ ] Design rare earth cards
+- [ ] Develop Angular website for athletes
+- [ ] Implement chat interface
+- [ ] Integrate XRP ledger for payments
+- [ ] Create XRP NFTs
+- [ ] 
+- [ ] 
+
+Medium Priority
+---------------
+- [ ] Set up cloud hosting environment (e.g., AWS, Azure, Google Cloud)
+- [ ] Design and set up database schema (for users, cards, NFTs, etc.)
+- [ ] Choose a backend framework (e.g., Node.js, Python/Django, etc.)
+- [ ] Plan API endpoints for frontend-backend communication
+- [ ] Set up version control (Git) and repository (GitHub, GitLab)
+
+Low Priority
+------------
+- [ ] Outline CI/CD pipeline for automated deployments
+- [ ] Research and select a payment gateway provider
+- [ ] Plan user authentication and security measures
+- [ ] Define analytics and monitoring strategy
+
+Completed
+---------
+- [x] Create project folder structure
+- [x] Set up social media credentials template
+- [x] Create `td-nft-cards` directory
+- [x] Create `todo-list.txt`
