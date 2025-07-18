@@ -24,6 +24,9 @@
 - [ ] Implement chat interface
 - [ ] Integrate XRP ledger for payments
 - [ ] Create XRP NFTs
+- [ ] **NEW: Implement NFT marketplace for buying/selling NFTs**
+- [ ] **NEW: Integrate XRPLE (XRP Ledger) with Flare smart contracts**
+- [ ] **NEW: Design marketplace UI/UX with trading features**
 - [ ] Design NFT metadata schema
 - [ ] Prototype QR/NFC scan flow
 - [ ] Set up cloud hosting (AWS, Azure, etc.)
@@ -35,6 +38,9 @@
 - [ ] Design database schema (users, cards, NFTs, redemptions)
 - [ ] Choose backend framework (Node.js, Django, etc.)
 - [ ] Plan API endpoints for frontend-backend communication
+- [ ] **NEW: Implement marketplace backend APIs (listings, offers, transactions)**
+- [ ] **NEW: Integrate Flare smart contract deployment and interaction**
+- [ ] **NEW: Build marketplace transaction history and analytics**
 - [ ] Create admin dashboard wireframe
 - [ ] Plan influencer outreach strategy
 - [ ] Define voting logic & engagement scoring
@@ -45,7 +51,43 @@
 
 - [ ] Draft legal disclaimers (parody, redemption terms)
 - [ ] Explore XRPL royalties & resale tracking
+- [ ] **NEW: Implement marketplace security measures and fraud prevention**
+- [ ] **NEW: Test Flare smart contract integration and gas optimization**
+- [ ] **NEW: Set up marketplace escrow and dispute resolution**
 - [ ] Plan user authentication & security
 - [ ] Outline CI/CD pipeline for automated deployments
 - [ ] Define analytics & monitoring strategy
+
+---
+
+## 🔗 New Addition: Blockchain Marketplace & Smart Contracts
+
+### NFT Marketplace Features:
+- [ ] **Marketplace Core Functionality:**
+  - [ ] Buy/Sell NFT interface
+  - [ ] Auction system for rare cards
+  - [ ] Bid management and notifications
+  - [ ] Price history and market analytics
+  - [ ] Featured marketplace listings
+
+### XRPLE + Flare Integration:
+- [ ] **Smart Contract Development:**
+  - [ ] Deploy smart contracts on Flare network
+  - [ ] Integrate XRPLE for NFT creation and management
+  - [ ] Implement cross-chain functionality (XRP ↔ Flare)
+  - [ ] Gas optimization strategies
+  - [ ] Contract security auditing
+
+### Technical Implementation:
+- [ ] **Frontend Marketplace:**
+  - [ ] Angular marketplace components
+  - [ ] Web3 wallet integration (MetaMask, XUMM)
+  - [ ] Real-time price updates
+  - [ ] Marketplace search and filtering
+
+- [ ] **Backend Infrastructure:**
+  - [ ] Blockchain event listeners
+  - [ ] Transaction monitoring
+  - [ ] Marketplace API endpoints
+  - [ ] Off-chain metadata management
 - [ ] Plan physical card authentication (tamper-proof, serials, chips)
