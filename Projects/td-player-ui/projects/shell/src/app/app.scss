@@ -1,0 +1,120 @@
+/* Mobile-First Responsive Styles */
+
+/* Smooth transitions for mobile menu */
+.mobile-menu-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Ensure proper spacing on mobile */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Better touch targets for mobile */
+  .mobile-nav-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Enhanced focus states for accessibility */
+.nav-link:focus {
+  outline: 2px solid theme('colors.tda.primary.500');
+  outline-offset: 2px;
+}
+
+/* Improved mobile menu animation */
+#mobile-menu {
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+
+#mobile-menu.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+#mobile-menu:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Better footer spacing on mobile */
+@media (max-width: 640px) {
+  footer .grid {
+    text-align: center;
+  }
+  
+  footer .grid > div {
+    margin-bottom: 1.5rem;
+  }
+  
+  footer .grid > div:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Theme selector positioning adjustments */
+.theme-selector-container {
+  @media (max-width: 640px) {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    
+    .bg-bg-secondary {
+      border-radius: 0.5rem;
+    }
+  }
+}
+
+/* Sticky header improvements */
+header.sticky {
+  backdrop-filter: blur(8px);
+  background-color: rgba(var(--bg-secondary-rgb), 0.95);
+  
+  @supports not (backdrop-filter: blur(8px)) {
+    background-color: var(--bg-secondary);
+  }
+}
+
+/* Enhanced text glow effect */
+.text-glow {
+  text-shadow: 0 0 10px rgba(var(--tda-primary-500-rgb), 0.5);
+}
+
+/* Smooth hover transitions */
+a {
+  transition: color 0.2s ease-in-out;
+}
+
+/* Loading state for router-outlet */
+router-outlet + * {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Print styles */
+@media print {
+  header,
+  footer,
+  .theme-selector-container {
+    display: none;
+  }
+  
+  main {
+    margin: 0;
+    padding: 0;
+  }
+}
