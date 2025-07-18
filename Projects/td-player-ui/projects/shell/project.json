@@ -14,9 +14,7 @@
       "executor": "@angular/build:application",
       "options": {
         "browser": "projects/shell/src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "projects/shell/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -25,9 +23,7 @@
             "input": "projects/shell/public"
           }
         ],
-        "styles": [
-          "projects/shell/src/styles.scss"
-        ],
+        "styles": ["projects/shell/src/styles.scss"],
         "server": "projects/shell/src/main.server.ts",
         "outputMode": "server",
         "ssr": {
@@ -58,9 +54,7 @@
         }
       },
       "defaultConfiguration": "production",
-      "outputs": [
-        "{options.outputPath}"
-      ]
+      "outputs": ["{options.outputPath}"]
     },
     "serve": {
       "executor": "@angular/build:dev-server",
@@ -80,10 +74,7 @@
     "test": {
       "executor": "@angular/build:karma",
       "options": {
-        "polyfills": [
-          "zone.js",
-          "zone.js/testing"
-        ],
+        "polyfills": ["zone.js", "zone.js/testing"],
         "tsConfig": "projects/shell/tsconfig.spec.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -92,9 +83,7 @@
             "input": "projects/shell/public"
           }
         ],
-        "styles": [
-          "projects/shell/src/styles.scss"
-        ]
+        "styles": ["projects/shell/src/styles.scss"]
       }
     }
   }

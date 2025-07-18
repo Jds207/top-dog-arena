@@ -1,17 +1,24 @@
-import { Component, OnInit, ViewContainerRef, ComponentRef, Inject, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewContainerRef,
+  ComponentRef,
+  Inject,
+  PLATFORM_ID,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { loadRemoteModule } from '@angular-architects/module-federation';
-import { LandingPageComponent } from './local-landing-page.component';
+import { LocalLandingPageComponent } from './local-landing-page.component';
 
 @Component({
   selector: 'app-remote-wrapper',
   standalone: true,
-  imports: [CommonModule, LandingPageComponent],
+  imports: [CommonModule, LocalLandingPageComponent],
   template: `
     <div #container>
       <app-local-landing-page *ngIf="!isRemoteLoaded"></app-local-landing-page>
     </div>
-  `
+  `,
 })
 export class RemoteWrapperComponent implements OnInit {
   isRemoteLoaded = false;
@@ -19,7 +26,7 @@ export class RemoteWrapperComponent implements OnInit {
 
   constructor(
     private viewContainer: ViewContainerRef,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
   async ngOnInit() {
@@ -28,17 +35,21 @@ export class RemoteWrapperComponent implements OnInit {
         const module = await loadRemoteModule({
           type: 'module',
           remoteEntry: 'http://localhost:4201/remoteEntry.js',
-          exposedModule: './Component'
+          exposedModule: './Component',
         });
-        
+
         const componentClass = module.LandingPageComponent;
         if (componentClass) {
           this.viewContainer.clear();
-          this.componentRef = this.viewContainer.createComponent(componentClass);
+          this.componentRef =
+            this.viewContainer.createComponent(componentClass);
           this.isRemoteLoaded = true;
         }
       } catch (error) {
-        console.warn('Could not load remote module, using local fallback:', error);
+        console.warn(
+          'Could not load remote module, using local fallback:',
+          error,
+        );
         // The local component will remain visible
       }
     }

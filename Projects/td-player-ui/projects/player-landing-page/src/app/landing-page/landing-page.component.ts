@@ -5,14 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-landing-page',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <p>
-      landing-page works!
-    </p>
-  `,
-  styles: [
-  ]
+  template: ` <p>landing-page works!</p> `,
+  styles: [],
 })
-export class LandingPageComponent {
-
-}
+export class LandingPageComponent {}

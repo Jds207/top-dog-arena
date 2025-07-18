@@ -15,34 +15,39 @@ import { RouterLink } from '@angular/router';
         <li>Network connectivity issues</li>
         <li>Configuration problems</li>
       </ul>
-      <p>Please ensure the Player Landing Page application is running on port 4201.</p>
+      <p>
+        Please ensure the Player Landing Page application is running on port
+        4201.
+      </p>
       <button routerLink="/" class="back-button">Back to Home</button>
     </div>
   `,
-  styles: [`
-    .fallback {
-      padding: 2rem;
-      background-color: #fee;
-      border: 1px solid #fcc;
-      border-radius: 8px;
-      margin: 1rem;
-    }
-    
-    .back-button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 1rem;
-    }
-    
-    .back-button:hover {
-      background-color: #0056b3;
-    }
-  `]
+  styles: [
+    `
+      .fallback {
+        padding: 2rem;
+        background-color: #fee;
+        border: 1px solid #fcc;
+        border-radius: 8px;
+        margin: 1rem;
+      }
+
+      .back-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 1rem;
+      }
+
+      .back-button:hover {
+        background-color: #0056b3;
+      }
+    `,
+  ],
 })
-export class FallbackComponent { }
+export class FallbackComponent {}

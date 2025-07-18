@@ -21,9 +21,7 @@
               "path": "projects/shell/webpack.config.js"
             },
             "browser": "projects/shell/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "projects/shell/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -32,9 +30,7 @@
                 "input": "projects/shell/public"
               }
             ],
-            "styles": [
-              "projects/shell/src/styles.scss"
-            ],
+            "styles": ["projects/shell/src/styles.scss"],
             "server": "projects/shell/src/main.server.ts",
             "outputMode": "server",
             "ssr": {
@@ -80,13 +76,19 @@
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
         },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/shell/**/*.ts",
+              "projects/shell/**/*.html"
+            ]
+          }
+        },
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/shell/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -95,9 +97,7 @@
                 "input": "projects/shell/public"
               }
             ],
-            "styles": [
-              "projects/shell/src/styles.scss"
-            ]
+            "styles": ["projects/shell/src/styles.scss"]
           }
         }
       }
@@ -120,9 +120,7 @@
               "path": "projects/player-landing-page/webpack.config.js"
             },
             "browser": "projects/player-landing-page/src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "projects/player-landing-page/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -131,9 +129,7 @@
                 "input": "projects/player-landing-page/public"
               }
             ],
-            "styles": [
-              "projects/player-landing-page/src/styles.scss"
-            ],
+            "styles": ["projects/player-landing-page/src/styles.scss"],
             "server": "projects/player-landing-page/src/main.server.ts",
             "outputMode": "server",
             "ssr": {
@@ -179,13 +175,19 @@
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
         },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/player-landing-page/**/*.ts",
+              "projects/player-landing-page/**/*.html"
+            ]
+          }
+        },
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/player-landing-page/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -194,9 +196,7 @@
                 "input": "projects/player-landing-page/public"
               }
             ],
-            "styles": [
-              "projects/player-landing-page/src/styles.scss"
-            ]
+            "styles": ["projects/player-landing-page/src/styles.scss"]
           }
         }
       }
