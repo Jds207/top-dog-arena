@@ -14,6 +14,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'settings',
+    loadComponent: () =>
+      import('./components/settings.component').then((m) => m.SettingsComponent),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

@@ -1,6 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 /**
  * Fallback component displayed when remote module federation loading fails.
@@ -9,12 +9,12 @@ import { RouterLink, Router } from '@angular/router';
 @Component({
   selector: 'app-fallback',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './fallback.component.html',
   styleUrls: ['./fallback.component.scss'],
 })
 export class FallbackComponent implements OnInit {
-  private readonly router = inject(Router);
+  constructor(private readonly router: Router) {}
 
   /**
    * Error details that can be passed to the component for better debugging

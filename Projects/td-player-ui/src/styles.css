@@ -30,6 +30,45 @@
   --shadow-color: 0 0 0;
 }
 
+/* Gaming Theme */
+.theme-gaming {
+  --color-bg-primary: 0 0 0;
+  --color-bg-secondary: 17 24 39;
+  --color-bg-tertiary: 31 41 55;
+  --color-text-primary: 34 197 94;
+  --color-text-secondary: 74 222 128;
+  --color-text-muted: 134 239 172;
+  --color-border: 16 185 129;
+  --color-border-light: 52 211 153;
+  --shadow-color: 34 197 94;
+}
+
+/* Arena Theme */
+.theme-arena {
+  --color-bg-primary: 127 29 29;
+  --color-bg-secondary: 153 27 27;
+  --color-bg-tertiary: 185 28 28;
+  --color-text-primary: 254 226 226;
+  --color-text-secondary: 248 113 113;
+  --color-text-muted: 239 68 68;
+  --color-border: 220 38 38;
+  --color-border-light: 248 113 113;
+  --shadow-color: 220 38 38;
+}
+
+/* Neon Theme */
+.theme-neon {
+  --color-bg-primary: 3 7 18;
+  --color-bg-secondary: 15 23 42;
+  --color-bg-tertiary: 30 41 59;
+  --color-text-primary: 147 51 234;
+  --color-text-secondary: 196 181 253;
+  --color-text-muted: 168 85 247;
+  --color-border: 124 58 237;
+  --color-border-light: 147 51 234;
+  --shadow-color: 147 51 234;
+}
+
 /* Base styles */
 body {
   background-color: rgb(var(--color-bg-primary));
@@ -49,4 +88,47 @@ h1, h2, h3, h4, h5, h6 {
   font-family: ui-serif, Georgia, Cambria, serif;
   font-weight: 600;
   color: rgb(var(--color-text-primary));
+}
+
+/* Navigation styling */
+.nav-link {
+  color: rgb(var(--color-text-primary));
+  text-shadow: 0 1px 2px rgba(var(--shadow-color), 0.1);
+}
+
+.nav-link:hover {
+  color: #f97316; /* Orange hover color */
+}
+
+/* Theme-specific navigation enhancements */
+.theme-gaming .nav-link {
+  text-shadow: 0 0 4px rgba(var(--shadow-color), 0.5);
+}
+
+.theme-arena .nav-link {
+  text-shadow: 0 0 4px rgba(var(--shadow-color), 0.3);
+}
+
+.theme-neon .nav-link {
+  text-shadow: 0 0 6px rgba(var(--shadow-color), 0.4);
+}
+
+/* Mobile navigation styling */
+.mobile-nav-link {
+  color: rgb(var(--color-text-primary));
+}
+
+.mobile-nav-link:hover {
+  color: #f97316;
+  background-color: rgba(var(--color-bg-tertiary), 0.5);
+}
+
+/* Mobile menu button styling */
+.mobile-menu-btn {
+  color: rgb(var(--color-text-primary));
+}
+
+.mobile-menu-btn:hover {
+  color: #f97316;
+  background-color: rgba(var(--color-bg-secondary), 0.5);
 }

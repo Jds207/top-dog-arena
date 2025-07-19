@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService, type Theme } from '../services/theme.service';
 
@@ -145,12 +145,12 @@ import { ThemeService, type Theme } from '../services/theme.service';
   `]
 })
 export class ThemeSelectorComponent {
-  private readonly themeService = inject(ThemeService);
-  
   // Computed properties from service
   readonly availableThemes = computed(() => this.themeService.availableThemes());
   readonly currentTheme = computed(() => this.themeService.theme());
   readonly isDarkMode = computed(() => this.themeService.isDarkMode());
+
+  constructor(private readonly themeService: ThemeService) {}
 
   /**
    * Select a specific theme
