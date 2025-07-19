@@ -1,0 +1,39 @@
+# TODO List for Top Dog Arena
+
+- [ ] Dockerize the UI (Angular app)
+- [ ] Create backend app and dockerize it
+- [ ] Create infrastructure as code to deploy infrastructure to cloud
+- [ ] Add WebSocket infrastructure for real-time features
+- [ ] Create secure store to accept payments in XRP
+- [ ] Integrate XRP Ledger for payments
+- [ ] Implement NFT marketplace for buying/selling NFTs
+- [ ] Integrate XRPLE (XRP Ledger) with Flare smart contracts
+- [ ] Design marketplace UI/UX with trading features
+- [ ] Design NFT metadata schema
+- [ ] Set up cloud hosting (AWS, Azure, etc.)
+- [ ] Design database schema (users, cards, NFTs, redemptions)
+- [ ] Choose backend framework (Node.js, Django, etc.)
+- [ ] Plan API endpoints for frontend-backend communication
+- [ ] Implement marketplace backend APIs (listings, offers, transactions)
+- [ ] Integrate Flare smart contract deployment and interaction
+- [ ] Build marketplace transaction history and analytics
+- [ ] Create admin dashboard wireframe
+- [ ] Plan influencer outreach strategy
+- [ ] Define voting logic & engagement scoring
+- [ ] Draft legal disclaimers (parody, redemption terms)
+- [ ] Explore XRPL royalties & resale tracking
+- [ ] Implement marketplace security measures and fraud prevention
+- [ ] Test Flare smart contract integration and gas optimization
+- [ ] Set up marketplace escrow and dispute resolution
+- [ ] Plan user authentication & security
+- [ ] Outline CI/CD pipeline for automated deployments
+- [ ] Define analytics & monitoring strategy
+- [ ] Angular marketplace components
+- [ ] Web3 wallet integration (MetaMask, XUMM)
+- [ ] Real-time price updates
+- [ ] Marketplace search and filtering
+- [ ] Blockchain event listeners
+- [ ] Transaction monitoring
+- [ ] Marketplace API endpoints
+- [ ] Off-chain metadata management
+- [ ] Plan physical card authentication (tamper-proof, serials, chips)
