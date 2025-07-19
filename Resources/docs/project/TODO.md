@@ -28,7 +28,7 @@
 - [ ] Plan user authentication & security
 - [ ] Outline CI/CD pipeline for automated deployments
 - [ ] Define analytics & monitoring strategy
-- [ ] Angular marketplace components
+- [x] Angular marketplace components (Arena homepage components created)
 - [ ] Web3 wallet integration (MetaMask, XUMM)
 - [ ] Real-time price updates
 - [ ] Marketplace search and filtering

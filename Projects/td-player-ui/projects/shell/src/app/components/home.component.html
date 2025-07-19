@@ -1,112 +1,38 @@
-<!-- Arena Banner - Full Width -->
-<section class="relative w-screen left-1/2 -translate-x-1/2 mb-8">
-  <div class="w-full overflow-hidden bg-gray-900" style="aspect-ratio: 3/1; max-height: 500px;">
-    <img src="images/arena-banner.png" 
-         alt="The Arena Unleashed - Top Dog Arena" 
-         class="w-full h-full object-contain hover:scale-105 transition-transform duration-500" 
-         style="min-height: 200px; max-height: 500px;" />
+<!-- Arena-Style Homepage -->
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+  
+  <!-- Arena Overview Banner -->
+  <arena-banner 
+    [contestTitle]="'Top Meme Showdown - August 2025'"
+    [startDate]="'August 1, 2025'"
+    [endDate]="'August 31, 2025'"
+    [tagline]="'The ultimate battle arena where memes clash and legends are born'">
+  </arena-banner>
+  
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Featured Battle Panel -->
+    <battle-card 
+      [battle]="currentBattle"
+      (voteSubmitted)="onVoteSubmitted($event)">
+    </battle-card>
+    
+    <!-- Statistics Section -->
+    <stats-panel 
+      [stats]="arenaStats">
+    </stats-panel>
+    
+    <!-- Call to Action -->
+    <call-to-action 
+      (nominatePlayer)="onNominatePlayer()"
+      (claimNFT)="onClaimNFT()">
+    </call-to-action>
+    
   </div>
-</section>
-
-<div class="max-w-4xl mx-auto">
-
-  <!-- Hero Section -->
-  <section class="text-center py-12 md:py-20">
-    <h1 class="text-4xl md:text-6xl font-bold text-text-primary mb-6 text-glow">
-      🏟️ Welcome to Top Dog Arena
-    </h1>
-    <p class="text-xl md:text-2xl text-text-secondary mb-8 max-w-2xl mx-auto">
-      The ultimate competitive gaming platform where champions are made and legends are born.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a routerLink="/player-landing-page" 
-         class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-tda-primary-600 hover:bg-tda-primary-700 transition-colors">
-        🎮 Enter Player Hub
-      </a>
-      <a routerLink="/tournaments" 
-         class="inline-flex items-center justify-center px-6 py-3 border-2 border-tda-primary-600 text-base font-medium rounded-md text-tda-primary-600 hover:bg-tda-primary-600 hover:text-white transition-colors">
-        🏆 View Tournaments
-      </a>
-    </div>
-  </section>
-
-  <!-- Features Grid -->
-  <section class="py-12">
-    <h2 class="text-3xl font-bold text-text-primary text-center mb-12">
-      What Makes Us Different?
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="feature-card bg-bg-secondary rounded-lg p-6 border border-border hover:border-tda-primary-500 transition-all duration-300 hover:transform hover:-translate-y-1">
-        <div class="text-4xl mb-4 text-center">🎮</div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2 text-center">Play Games</h3>
-        <p class="text-text-secondary text-sm text-center">
-          Engage in competitive card battles with your NFT collection
-        </p>
-      </div>
-      <div class="feature-card bg-bg-secondary rounded-lg p-6 border border-border hover:border-tda-primary-500 transition-all duration-300 hover:transform hover:-translate-y-1">
-        <div class="text-4xl mb-4 text-center">🏆</div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2 text-center">Join Tournaments</h3>
-        <p class="text-text-secondary text-sm text-center">
-          Compete in tournaments to win rare cards and prizes
-        </p>
-      </div>
-      <div class="feature-card bg-bg-secondary rounded-lg p-6 border border-border hover:border-tda-primary-500 transition-all duration-300 hover:transform hover:-translate-y-1">
-        <div class="text-4xl mb-4 text-center">💎</div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2 text-center">Collect NFTs</h3>
-        <p class="text-text-secondary text-sm text-center">
-          Build your unique collection of digital trading cards
-        </p>
-      </div>
-      <div class="feature-card bg-bg-secondary rounded-lg p-6 border border-border hover:border-tda-primary-500 transition-all duration-300 hover:transform hover:-translate-y-1">
-        <div class="text-4xl mb-4 text-center">📊</div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2 text-center">Track Stats</h3>
-        <p class="text-text-secondary text-sm text-center">
-          Monitor your performance and climb the leaderboards
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Statistics Section -->
-  <section class="py-12 bg-bg-secondary rounded-lg border border-border mb-12">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl md:text-3xl font-bold text-text-primary mb-4">
-        Join the Arena
-      </h2>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-      <div>
-        <div class="text-3xl md:text-4xl font-bold text-tda-primary-500 mb-2">10K+</div>
-        <div class="text-text-secondary">Active Players</div>
-      </div>
-      <div>
-        <div class="text-3xl md:text-4xl font-bold text-tda-primary-500 mb-2">500+</div>
-        <div class="text-text-secondary">Daily Tournaments</div>
-      </div>
-      <div>
-        <div class="text-3xl md:text-4xl font-bold text-tda-primary-500 mb-2">$1M+</div>
-        <div class="text-text-secondary">Prizes Awarded</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Call to Action -->
-  <section class="bg-gradient-to-r from-tda-primary-600 to-tda-primary-700 rounded-lg p-8 md:p-12 text-center text-white">
-    <h2 class="text-2xl md:text-3xl font-bold mb-4">
-      Ready to Become the Top Dog? 🐕
-    </h2>
-    <p class="mb-6 max-w-2xl mx-auto opacity-90">
-      Join thousands of players competing for glory, prizes, and the ultimate bragging rights in the most competitive gaming arena.
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a routerLink="/player-landing-page" 
-         class="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-lg font-medium rounded-md text-white hover:bg-white hover:text-tda-primary-700 transition-colors">
-        Get Started Now 🚀
-      </a>
-      <a routerLink="/leaderboard" 
-         class="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-lg font-medium rounded-md text-white hover:bg-white hover:text-tda-primary-700 transition-colors">
-        View Leaderboard 📊
-      </a>
-    </div>
-  </section>
+  
+  <!-- Footer -->
+  <footer-panel 
+    [stats]="footerStats">
+  </footer-panel>
+  
 </div>
