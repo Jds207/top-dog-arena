@@ -49,22 +49,25 @@ import { ThemeService, type Theme } from '../services/theme.service';
     }
 
     .theme-colors {
-      @apply flex gap-1;
+      display: flex;
+      gap: 0.25rem;
     }
 
     .color-sample {
-      @apply w-3 h-3 rounded-full;
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 9999px;
       
       &.primary {
-        @apply bg-tda-primary-500;
+        background-color: #f97316;
       }
       
       &.secondary {
-        @apply bg-tda-secondary-500;
+        background-color: #64748b;
       }
       
       &.accent {
-        @apply bg-tda-accent-500;
+        background-color: #e439f1;
       }
     }
 
