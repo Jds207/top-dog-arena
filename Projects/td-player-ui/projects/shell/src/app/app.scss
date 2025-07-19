@@ -88,6 +88,24 @@ header::before {
   border-radius: 6px;
 }
 
+/* Ensure navigation links are clickable */
+.nav-link, 
+.mobile-nav-link,
+a[routerLink],
+button {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 10;
+}
+
+/* Mobile menu toggle button specifically */
+.md\\:hidden button {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  z-index: 20;
+}
+
 /* Improved mobile menu animation */
 #mobile-menu {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

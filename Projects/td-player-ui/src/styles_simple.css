@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Top Dog Arena Global Styles with Theme Support - Simplified */
+
+/* Light Theme (default) */
+:root {
+  --color-bg-primary: 255 255 255;
+  --color-bg-secondary: 248 250 252;
+  --color-bg-tertiary: 241 245 249;
+  --color-text-primary: 15 23 42;
+  --color-text-secondary: 71 85 105;
+  --color-text-muted: 148 163 184;
+  --color-border: 226 232 240;
+  --color-border-light: 241 245 249;
+  --shadow-color: 0 0 0;
+}
+
+/* Dark Theme */
+.dark {
+  --color-bg-primary: 15 23 42;
+  --color-bg-secondary: 30 41 59;
+  --color-bg-tertiary: 51 65 85;
+  --color-text-primary: 248 250 252;
+  --color-text-secondary: 203 213 225;
+  --color-text-muted: 148 163 184;
+  --color-border: 71 85 105;
+  --color-border-light: 51 65 85;
+  --shadow-color: 0 0 0;
+}
+
+/* Base styles */
+body {
+  background-color: rgb(var(--color-bg-primary));
+  color: rgb(var(--color-text-primary));
+  transition: colors 300ms;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: ui-serif, Georgia, Cambria, serif;
+  font-weight: 600;
+  color: rgb(var(--color-text-primary));
+}

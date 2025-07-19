@@ -1,0 +1,309 @@
+<!-- NFT Marketplace Header -->
+<div class="marketplace-container">
+  <!-- Hero Section with Banner -->
+  <div class="hero-section">
+    <div class="hero-banner">
+      <img src="assets/images/marketplace-banner.png" alt="Top Dog Arena Marketplace" class="banner-image">
+      <div class="banner-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-title">🐕⚾ Top Dog Baseball Cards</h1>
+      <p class="hero-subtitle">Collect legendary baseball dogs and trade rare cards</p>
+      
+      <!-- Market Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">{{ formatNumber(marketStats().totalVolume) }}</div>
+          <div class="stat-label">Total Volume (ETH)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ formatNumber(marketStats().totalNFTs) }}</div>
+          <div class="stat-label">Total Cards</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ formatNumber(marketStats().totalUsers) }}</div>
+          <div class="stat-label">Collectors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ marketStats().floorPrice.toFixed(3) }}</div>
+          <div class="stat-label">Floor Price (ETH)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured NFTs Section -->
+  <div class="featured-section">
+    <h2 class="section-title">⭐ Featured Baseball Cards</h2>
+    <div class="featured-grid">
+      <div 
+        *ngFor="let nft of featuredNFTs()" 
+        class="baseball-card featured-card"
+        (click)="onNFTClick(nft)"
+      >
+        <div class="card-header">
+          <div class="team-logo">🐕</div>
+          <div class="rarity-badge" [style.background-color]="getRarityColor(nft.rarity)">
+            {{ nft.rarity | titlecase }}
+          </div>
+        </div>
+        
+        <div class="card-image-container">
+          <img [src]="nft.image" [alt]="nft.name" class="card-image">
+        </div>
+        
+        <div class="card-info">
+          <h3 class="player-name">{{ nft.name }}</h3>
+          <div class="card-stats">
+            <div *ngFor="let attr of nft.attributes.slice(0, 2)" class="stat-item">
+              <span class="stat-label">{{ attr.trait_type }}</span>
+              <span class="stat-value">{{ attr.value }}</span>
+            </div>
+          </div>
+          <div class="card-price">
+            <span class="price-value">{{ formatPrice(nft.price, nft.currency) }}</span>
+            <div class="card-actions">
+              <button 
+                class="like-button"
+                (click)="onLikeNFT(nft, $event)"
+              >
+                ❤️ {{ nft.likes }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Marketplace -->
+  <div class="marketplace-main">
+    <!-- Search and Filters Bar -->
+    <div class="marketplace-controls">
+      <div class="search-section">
+        <input 
+          type="text" 
+          placeholder="Search baseball cards, players, or teams..."
+          class="search-input"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="searchQuery.set($event)"
+        >
+        <button class="filter-toggle" (click)="toggleFilters()">
+          🔍 Filters
+        </button>
+      </div>
+
+      <div class="view-controls">
+        <select class="sort-select" (change)="onSortChange($event)">
+          <option value="price-asc" selected>Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="date-desc">Newest Cards</option>
+          <option value="date-asc">Oldest Cards</option>
+          <option value="popularity-desc">Most Popular</option>
+        </select>
+        
+        <button 
+          class="view-toggle"
+          (click)="toggleView()"
+          [class.active]="selectedView() === 'grid'"
+        >
+          {{ selectedView() === 'grid' ? '⊞' : '☰' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters" [class.show]="showFilters()">
+      <button 
+        *ngFor="let category of categories"
+        class="category-btn"
+        [class.active]="selectedCategory() === category.id"
+        (click)="selectCategory(category.id)"
+      >
+        <span class="category-icon">{{ category.icon }}</span>
+        <span class="category-name">{{ category.name }}</span>
+      </button>
+    </div>
+
+    <!-- Baseball Cards Grid/List -->
+    <div class="cards-container" [class.list-view]="selectedView() === 'list'">
+      <div 
+        *ngFor="let nft of filteredNFTs(); trackBy: trackByNFTId" 
+        class="baseball-card"
+        (click)="onNFTClick(nft)"
+      >
+        <!-- Baseball Card Front -->
+        <div class="card-front">
+          <div class="card-header">
+            <div class="team-info">
+              <span class="team-logo">🐕</span>
+              <span class="team-name">Top Dogs</span>
+            </div>
+            <div class="rarity-badge" [style.background-color]="getRarityColor(nft.rarity)">
+              {{ nft.rarity | titlecase }}
+            </div>
+          </div>
+          
+          <div class="card-image-section">
+            <img [src]="nft.image" [alt]="nft.name" class="player-image">
+          </div>
+          
+          <div class="card-info-section">
+            <h3 class="player-name">{{ nft.name }}</h3>
+            <div class="player-position">{{ nft.attributes[2] ? nft.attributes[2].value : 'Player' }}</div>
+            
+            <div class="card-stats">
+              <div class="stats-grid">
+                <div *ngFor="let attr of nft.attributes.slice(0, 4)" class="stat-box">
+                  <div class="stat-label">{{ attr.trait_type }}</div>
+                  <div class="stat-value">{{ attr.value }}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-bottom">
+              <div class="price-section">
+                <div class="price-label">Market Price</div>
+                <div class="price-value">{{ formatPrice(nft.price, nft.currency) }}</div>
+                <div class="price-usd">~${{ (nft.price * 2400).toFixed(0) }}</div>
+              </div>
+              
+              <div class="card-actions">
+                <button 
+                  class="action-button like-btn"
+                  (click)="onLikeNFT(nft, $event)"
+                >
+                  ❤️ {{ nft.likes }}
+                </button>
+                <button 
+                  *ngIf="nft.isForSale" 
+                  class="action-button buy-btn"
+                  (click)="onBuyNFT(nft); $event.stopPropagation()"
+                >
+                  � Buy
+                </button>
+                <button 
+                  *ngIf="!nft.isForSale" 
+                  class="action-button list-btn"
+                  (click)="onListNFT(nft); $event.stopPropagation()"
+                >
+                  🏷️ List
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card Number -->
+        <div class="card-number">#{{ nft.tokenId }}</div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading baseball cards...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading() && filteredNFTs().length === 0" class="empty-state">
+      <div class="empty-icon">🃏</div>
+      <h3>No Baseball Cards Found</h3>
+      <p>Try adjusting your search or filter criteria</p>
+    </div>
+  </div>
+</div>
+
+<!-- Purchase Modal -->
+<div *ngIf="showPurchaseModal()" class="modal-overlay" (click)="closeModals()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Purchase NFT</h2>
+      <button class="close-btn" (click)="closeModals()">✕</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedNFT()">
+      <div class="purchase-nft-preview">
+        <img [src]="selectedNFT()!.image" [alt]="selectedNFT()!.name" class="modal-nft-image">
+        <div class="purchase-details">
+          <h3>{{ selectedNFT()!.name }}</h3>
+          <p class="modal-nft-description">{{ selectedNFT()!.description }}</p>
+          <div class="purchase-price">
+            <span class="price-label">Total Price</span>
+            <div class="total-price">{{ formatPrice(selectedNFT()!.price, selectedNFT()!.currency) }}</div>
+            <div class="price-usd">~${{ (selectedNFT()!.price * 2400).toFixed(0) }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="purchase-warning">
+        ⚠️ Make sure you have enough {{ selectedNFT()!.currency }} in your wallet to complete this purchase.
+      </div>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="modal-btn cancel-btn" (click)="closeModals()">Cancel</button>
+      <button 
+        class="modal-btn confirm-btn" 
+        (click)="confirmPurchase()"
+        [disabled]="isLoading()"
+      >
+        {{ isLoading() ? 'Processing...' : 'Confirm Purchase' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- List for Sale Modal -->
+<div *ngIf="showListModal()" class="modal-overlay" (click)="closeModals()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>List NFT for Sale</h2>
+      <button class="close-btn" (click)="closeModals()">✕</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedNFT()">
+      <div class="list-nft-preview">
+        <img [src]="selectedNFT()!.image" [alt]="selectedNFT()!.name" class="modal-nft-image">
+        <div class="list-details">
+          <h3>{{ selectedNFT()!.name }}</h3>
+          
+          <div class="price-input-section">
+            <label class="input-label">List Price</label>
+            <div class="price-input-group">
+              <input 
+                type="number" 
+                class="price-input"
+                [(ngModel)]="listingPrice"
+                (ngModelChange)="listingPrice.set($event)"
+                step="0.01"
+                min="0.01"
+              >
+              <select 
+                class="currency-select"
+                [(ngModel)]="listingCurrency"
+                (ngModelChange)="listingCurrency.set($event)"
+              >
+                <option value="ETH">ETH</option>
+                <option value="TDA">TDA</option>
+                <option value="USDC">USDC</option>
+              </select>
+            </div>
+            <div class="price-usd">~${{ (listingPrice() * 2400).toFixed(0) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="modal-btn cancel-btn" (click)="closeModals()">Cancel</button>
+      <button 
+        class="modal-btn confirm-btn" 
+        (click)="confirmListing()"
+        [disabled]="isLoading() || listingPrice() <= 0"
+      >
+        {{ isLoading() ? 'Processing...' : 'List for Sale' }}
+      </button>
+    </div>
+  </div>
+</div>

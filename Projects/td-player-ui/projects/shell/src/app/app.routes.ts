@@ -19,6 +19,11 @@ export const routes: Routes = [
       import('./components/settings.component').then((m) => m.SettingsComponent),
   },
   {
+    path: 'nft-marketplace',
+    loadComponent: () =>
+      import('./components/nft-marketplace/nft-marketplace.component').then((m) => m.NftMarketplaceComponent),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
