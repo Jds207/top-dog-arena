@@ -1,0 +1,6 @@
+<svg width="800" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="200" fill="#FFD700"/>
+  <text x="400" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#000000">
+    🏆 Arena Champions Collection
+  </text>
+</svg>

@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { NFTMarketplaceService, NFT, NFTCollection } from '../../services/nft-marketplace.service';
+import { FlippableNftCardComponent, FlippableNFT } from './flippable-nft-card.component';
 
 @Component({
   selector: 'app-nft-marketplace',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FlippableNftCardComponent],
   templateUrl: './nft-marketplace.component.html',
   styleUrl: './nft-marketplace.component.scss'
 })
@@ -44,13 +45,33 @@ export class NftMarketplaceComponent implements OnInit {
 
   // Categories for filtering
   categories = [
-    { id: 'all', name: 'All Cards', icon: '�' },
+    { id: 'all', name: 'All Cards', icon: '🃏' },
     { id: 'character', name: 'Players', icon: '🐕' },
     { id: 'rookie', name: 'Rookies', icon: '🌟' },
     { id: 'legend', name: 'Legends', icon: '👑' },
     { id: 'team', name: 'Team Cards', icon: '⚾' },
     { id: 'special', name: 'Special Edition', icon: '💎' }
   ];
+
+  // Big Dog NFT - Featured flippable card
+  bigDogNFT: FlippableNFT = {
+    id: 'big-dog-001',
+    name: 'Big Dog #001',
+    frontImage: 'assets/images/big-dog-front.png',
+    backImage: 'assets/images/big-dog-back.png',
+    rarity: 'legendary',
+    price: 5.5,
+    currency: 'ETH',
+    likes: 247,
+    attributes: [
+      { trait_type: 'Power', value: 95, rarity: 2.1 },
+      { trait_type: 'Speed', value: 88, rarity: 5.3 },
+      { trait_type: 'Position', value: 'Cleanup Hitter', rarity: 1.8 },
+      { trait_type: 'Team', value: 'Top Dogs', rarity: 100 },
+      { trait_type: 'Season', value: '2024', rarity: 15.2 },
+      { trait_type: 'Edition', value: 'Genesis', rarity: 0.5 }
+    ]
+  };
 
   constructor(
     private marketplaceService: NFTMarketplaceService,
@@ -60,7 +81,6 @@ export class NftMarketplaceComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleService.setTitle('NFT Marketplace - Top Dog Baseball Cards | Top Dog Arena');
-    // Load initial data if needed
   }
 
   // Filter and search methods
@@ -93,8 +113,6 @@ export class NftMarketplaceComponent implements OnInit {
   async onNFTClick(nft: NFT): Promise<void> {
     await this.marketplaceService.viewNFT(nft.id);
     this.selectedNFT.set(nft);
-    // Navigate to NFT detail page or open modal
-    // For now, we'll use a modal
   }
 
   async onLikeNFT(nft: NFT, event: Event): Promise<void> {
@@ -114,66 +132,92 @@ export class NftMarketplaceComponent implements OnInit {
     this.showListModal.set(true);
   }
 
+  // Big Dog NFT interaction methods
+  onBigDogLike(nft: FlippableNFT): void {
+    this.bigDogNFT.likes++;
+    console.log('Big Dog liked!', nft);
+  }
+
+  onBigDogBuy(nft: FlippableNFT): void {
+    this.showPurchaseModal.set(true);
+    console.log('Buying Big Dog NFT!', nft);
+  }
+
   // Modal methods
   async confirmPurchase(): Promise<void> {
     const nft = this.selectedNFT();
-    if (!nft) return;
-
-    const mockUserAddress = '0xuser123...abc'; // This would come from wallet connection
-    const success = await this.marketplaceService.buyNFT(nft.id, mockUserAddress);
-    
-    if (success) {
-      this.showPurchaseModal.set(false);
-      this.selectedNFT.set(null);
-      // Show success notification
+    if (nft) {
+      try {
+        // await this.marketplaceService.purchaseNFT(nft.id);
+        console.log('Purchase confirmed for:', nft.name);
+        this.showPurchaseModal.set(false);
+        this.selectedNFT.set(null);
+      } catch (error) {
+        console.error('Purchase failed:', error);
+      }
     }
   }
 
   async confirmListing(): Promise<void> {
     const nft = this.selectedNFT();
-    if (!nft) return;
-
-    const success = await this.marketplaceService.listNFTForSale(
-      nft.id,
-      this.listingPrice(),
-      this.listingCurrency()
-    );
-    
-    if (success) {
-      this.showListModal.set(false);
-      this.selectedNFT.set(null);
-      this.listingPrice.set(0);
-      // Show success notification
+    if (nft) {
+      try {
+        // await this.marketplaceService.listNFT(nft.id, this.listingPrice(), this.listingCurrency());
+        console.log('Listing confirmed for:', nft.name, 'at', this.listingPrice(), this.listingCurrency());
+        this.showListModal.set(false);
+        this.selectedNFT.set(null);
+        this.listingPrice.set(0);
+      } catch (error) {
+        console.error('Listing failed:', error);
+      }
     }
   }
 
-  closeModals(): void {
+  cancelModal(): void {
     this.showPurchaseModal.set(false);
     this.showListModal.set(false);
     this.selectedNFT.set(null);
+    this.listingPrice.set(0);
+  }
+
+  closeModals(): void {
+    this.cancelModal();
   }
 
   // Utility methods
   formatPrice(price: number, currency: string): string {
-    return this.marketplaceService.formatPrice(price, currency);
-  }
-
-  getRarityColor(rarity: string): string {
-    return this.marketplaceService.getRarityColor(rarity);
-  }
-
-  getCategoryIcon(category: string): string {
-    return this.marketplaceService.getCategoryIcon(category);
+    return `${price} ${currency}`;
   }
 
   formatNumber(num: number): string {
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
+    } else if (num >= 1000) {
       return (num / 1000).toFixed(1) + 'K';
     }
     return num.toString();
+  }
+
+  getRarityColor(rarity: string): string {
+    const colors = {
+      'common': '#8e8e93',
+      'uncommon': '#34c759',
+      'rare': '#007aff',
+      'epic': '#af52de',
+      'legendary': '#ff9500'
+    };
+    return colors[rarity as keyof typeof colors] || colors.common;
+  }
+
+  getRarityClass(rarity: string): string {
+    const rarityMap: Record<string, string> = {
+      'common': 'rarity-common',
+      'uncommon': 'rarity-uncommon',
+      'rare': 'rarity-rare',
+      'epic': 'rarity-epic',
+      'legendary': 'rarity-legendary'
+    };
+    return rarityMap[rarity] || 'rarity-common';
   }
 
   getTimeSince(dateString: string): string {

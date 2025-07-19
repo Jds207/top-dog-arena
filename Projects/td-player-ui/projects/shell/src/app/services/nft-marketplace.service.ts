@@ -88,7 +88,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator1...abc',
       name: 'Rex "The Slugger" Rodriguez',
       description: 'Golden Retriever power hitter with a .350 batting average. Known for his clutch home runs and legendary tail wags.',
-      image: 'https://via.placeholder.com/300x420/FFD700/8B4513?text=🐕⚾+Rex+The+Slugger',
+      image: 'assets/images/nft-rex-slugger.svg',
       price: 0.125,
       currency: 'ETH',
       category: 'character',
@@ -114,7 +114,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Rex "The Slugger" Rodriguez',
         description: 'Golden Retriever power hitter with exceptional batting skills',
-        image: 'https://via.placeholder.com/300x420/FFD700/8B4513?text=🐕⚾+Rex+The+Slugger',
+        image: 'assets/images/nft-rex-slugger.svg',
         attributes: [
           { trait_type: 'Batting Average', value: '.350' },
           { trait_type: 'Home Runs', value: 45 },
@@ -131,7 +131,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator2...def',
       name: 'Bella "Lightning Paws" Thompson',
       description: 'Border Collie speedster and base-stealing champion. Holds the record for stolen bases in a single season.',
-      image: 'https://via.placeholder.com/300x420/87CEEB/000000?text=🐕⚡+Bella+Lightning',
+      image: 'assets/images/nft-bella-lightning.svg',
       price: 0.089,
       currency: 'ETH',
       category: 'character',
@@ -150,7 +150,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Bella "Lightning Paws" Thompson',
         description: 'Border Collie speedster and base-stealing champion',
-        image: 'https://via.placeholder.com/300x420/87CEEB/000000?text=🐕⚡+Bella+Lightning',
+        image: 'assets/images/nft-bella-lightning.svg',
         attributes: [
           { trait_type: 'Speed', value: 98 },
           { trait_type: 'Stolen Bases', value: 87 },
@@ -167,7 +167,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator3...ghi',
       name: 'Max "The Ace" Wilson',
       description: 'German Shepherd pitcher with a devastating fastball. Three-time Cy Young winner and strikeout king.',
-      image: 'https://via.placeholder.com/300x420/8B4513/FFFFFF?text=🐕🥎+Max+The+Ace',
+      image: 'assets/images/nft-max-ace.svg',
       price: 0.156,
       currency: 'ETH',
       category: 'character',
@@ -186,7 +186,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Max "The Ace" Wilson',
         description: 'German Shepherd pitcher with devastating fastball',
-        image: 'https://via.placeholder.com/300x420/8B4513/FFFFFF?text=🐕🥎+Max+The+Ace',
+        image: 'assets/images/nft-max-ace.svg',
         attributes: [
           { trait_type: 'ERA', value: '1.85' },
           { trait_type: 'Strikeouts', value: 312 },
@@ -203,7 +203,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator4...jkl',
       name: 'Luna "The Wall" Garcia',
       description: 'Siberian Husky catcher with incredible defensive skills. Has never allowed a stolen base in her career.',
-      image: 'https://via.placeholder.com/300x420/C0C0C0/000000?text=🐕🧤+Luna+The+Wall',
+      image: 'assets/images/nft-luna-wall.svg',
       price: 0.067,
       currency: 'ETH',
       category: 'character',
@@ -229,7 +229,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Luna "The Wall" Garcia',
         description: 'Siberian Husky catcher with incredible defensive skills',
-        image: 'https://via.placeholder.com/300x420/C0C0C0/000000?text=🐕🧤+Luna+The+Wall',
+        image: 'assets/images/nft-luna-wall.svg',
         attributes: [
           { trait_type: 'Defense', value: 99 },
           { trait_type: 'Throwing Arm', value: 95 },
@@ -246,7 +246,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator5...mno',
       name: 'Buddy "Home Run" Davis',
       description: 'Bulldog slugger known for his powerful swing and clutch hitting. Never strikes out in crucial moments.',
-      image: 'https://via.placeholder.com/300x420/8B0000/FFFFFF?text=🐕💥+Buddy+HR',
+      image: 'assets/images/nft-buddy-hr.svg',
       price: 0.034,
       currency: 'ETH',
       category: 'character',
@@ -265,7 +265,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Buddy "Home Run" Davis',
         description: 'Bulldog slugger known for powerful swing and clutch hitting',
-        image: 'https://via.placeholder.com/300x420/8B0000/FFFFFF?text=🐕💥+Buddy+HR',
+        image: 'assets/images/nft-buddy-hr.svg',
         attributes: [
           { trait_type: 'Power', value: 88 },
           { trait_type: 'Clutch', value: 94 },
@@ -282,7 +282,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator6...pqr',
       name: 'Sadie "Gold Glove" Martinez',
       description: 'Australian Shepherd shortstop with unmatched fielding ability. Has won five consecutive Gold Gloves.',
-      image: 'https://via.placeholder.com/300x420/32CD32/000000?text=�⚾+Sadie+Glove',
+      image: 'assets/images/nft-sadie-glove.svg',
       price: 0.098,
       currency: 'ETH',
       category: 'character',
@@ -301,7 +301,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Sadie "Gold Glove" Martinez',
         description: 'Australian Shepherd shortstop with unmatched fielding ability',
-        image: 'https://via.placeholder.com/300x420/32CD32/000000?text=🐕⚾+Sadie+Glove',
+        image: 'assets/images/nft-sadie-glove.svg',
         attributes: [
           { trait_type: 'Fielding', value: 97 },
           { trait_type: 'Range', value: 93 },
@@ -318,7 +318,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator7...stu',
       name: 'Charlie "The Rookie" Johnson',
       description: 'Young Labrador with incredible potential. Fresh from the minor leagues with impressive stats.',
-      image: 'https://via.placeholder.com/300x420/FFB6C1/000000?text=🐕🌟+Charlie+Rookie',
+      image: 'assets/images/nft-charlie-rookie.svg',
       price: 0.021,
       currency: 'ETH',
       category: 'character',
@@ -337,7 +337,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Charlie "The Rookie" Johnson',
         description: 'Young Labrador with incredible potential from minor leagues',
-        image: 'https://via.placeholder.com/300x420/FFB6C1/000000?text=🐕🌟+Charlie+Rookie',
+        image: 'assets/images/nft-charlie-rookie.svg',
         attributes: [
           { trait_type: 'Potential', value: 92 },
           { trait_type: 'Learning', value: 89 },
@@ -354,7 +354,7 @@ export class NFTMarketplaceService {
       creator: '0xcreator8...vwx',
       name: 'Zeus "The Legend" Anderson',
       description: 'Hall of Fame Great Dane with record-breaking career stats. The most valuable baseball card in the collection.',
-      image: 'https://via.placeholder.com/300x420/9932CC/FFD700?text=🐕👑+Zeus+Legend',
+      image: 'assets/images/nft-zeus-legend.svg',
       price: 0.275,
       currency: 'ETH',
       category: 'character',
@@ -380,7 +380,7 @@ export class NFTMarketplaceService {
       metadata: {
         name: 'Zeus "The Legend" Anderson',
         description: 'Hall of Fame Great Dane with record-breaking career stats',
-        image: 'https://via.placeholder.com/300x420/9932CC/FFD700?text=🐕👑+Zeus+Legend',
+        image: 'assets/images/nft-zeus-legend.svg',
         attributes: [
           { trait_type: 'Career Average', value: '.387' },
           { trait_type: 'Hall of Fame', value: 'Yes' },
@@ -396,8 +396,8 @@ export class NFTMarketplaceService {
       id: '1',
       name: 'Arena Champions',
       description: 'Exclusive badges and rewards for Top Dog Arena champions',
-      image: 'https://via.placeholder.com/200x200/FFD700/000000?text=🏆+Champions',
-      banner: 'https://via.placeholder.com/800x200/FFD700/000000?text=Arena+Champions+Collection',
+      image: 'assets/images/collection-champions.svg',
+      banner: 'assets/images/collection-champions-banner.svg',
       creator: '0xcreator1...abc',
       contractAddress: '0x1234...abcd',
       floorPrice: 1.5,
@@ -412,8 +412,8 @@ export class NFTMarketplaceService {
       id: '2',
       name: 'Cyber Warriors',
       description: 'Futuristic character collection for arena battles',
-      image: 'https://via.placeholder.com/200x200/00FFFF/000000?text=🤖+Warriors',
-      banner: 'https://via.placeholder.com/800x200/00FFFF/000000?text=Cyber+Warriors+Collection',
+      image: 'assets/images/collection-cyber-warriors.svg',
+      banner: 'assets/images/collection-cyber-warriors-banner.svg',
       creator: '0xcreator2...def',
       contractAddress: '0x5678...efgh',
       floorPrice: 0.8,

@@ -35,6 +35,19 @@
   <!-- Featured NFTs Section -->
   <div class="featured-section">
     <h2 class="section-title">⭐ Featured Baseball Cards</h2>
+    
+    <!-- Big Dog NFT - Special Featured Card -->
+    <div class="big-dog-showcase">
+      <h3 class="showcase-title">🏆 Exclusive Big Dog NFT Collection</h3>
+      <div class="big-dog-container">
+        <app-flippable-nft-card 
+          [nft]="bigDogNFT"
+          (like)="onBigDogLike($event)"
+          (buy)="onBigDogBuy($event)"
+        ></app-flippable-nft-card>
+      </div>
+    </div>
+    
     <div class="featured-grid">
       <div 
         *ngFor="let nft of featuredNFTs()" 
