@@ -43,25 +43,53 @@ Top Dog Arena/
 │   │   │   │   │   ├── app/
 │   │   │   │   │   │   ├── components/
 │   │   │   │   │   │   │   ├── home.component.ts
-│   │   │   │   │   │   │   ├── nft-marketplace/
-│   │   │   │   │   │   │   │   ├── nft-marketplace.component.ts
-│   │   │   │   │   │   │   │   ├── nft-marketplace.component.html
-│   │   │   │   │   │   │   │   ├── nft-marketplace.component.scss
-│   │   │   │   │   │   │   │   └── flippable-nft-card.component.ts
 │   │   │   │   │   │   │   ├── arena/
+│   │   │   │   │   │   │   │   ├── arena-banner.component.ts
+│   │   │   │   │   │   │   │   ├── battle-card.component.ts
+│   │   │   │   │   │   │   │   ├── stats-panel.component.ts
+│   │   │   │   │   │   │   │   └── call-to-action.component.ts
 │   │   │   │   │   │   │   ├── settings/
-│   │   │   │   │   │   │   └── shared/
+│   │   │   │   │   │   │   ├── shared/
+│   │   │   │   │   │   │   └── remote-wrapper.component.ts  # Wrapper for remote modules
 │   │   │   │   │   │   ├── services/
-│   │   │   │   │   │   │   ├── nft-marketplace.service.ts
 │   │   │   │   │   │   │   ├── theme.service.ts
 │   │   │   │   │   │   │   └── websocket.service.ts
 │   │   │   │   │   │   └── interfaces/
 │   │   │   │   │   └── assets/
 │   │   │   │   │       └── images/
+│   │   │   │   │           ├── battle-meme-king.svg
+│   │   │   │   │           ├── battle-comedy-queen.svg
+│   │   │   │   │           └── logo/
+│   │   │   │   └── project.json
+│   │   │   ├── nft-marketplace/     # NFT Marketplace micro-frontend (port 4202)
+│   │   │   │   ├── src/
+│   │   │   │   │   ├── app/
+│   │   │   │   │   │   ├── components/
+│   │   │   │   │   │   │   ├── nft-marketplace.component.ts
+│   │   │   │   │   │   │   ├── nft-marketplace.component.html
+│   │   │   │   │   │   │   ├── nft-marketplace.component.scss
+│   │   │   │   │   │   │   ├── flippable-nft-card.component.ts
+│   │   │   │   │   │   │   ├── nft-card.component.ts
+│   │   │   │   │   │   │   ├── nft-grid.component.ts
+│   │   │   │   │   │   │   ├── nft-detail-modal.component.ts
+│   │   │   │   │   │   │   └── collection-card.component.ts
+│   │   │   │   │   │   ├── services/
+│   │   │   │   │   │   │   ├── nft-marketplace.service.ts
+│   │   │   │   │   │   │   ├── blockchain.service.ts
+│   │   │   │   │   │   │   └── ipfs.service.ts
+│   │   │   │   │   │   ├── interfaces/
+│   │   │   │   │   │   │   ├── nft.interface.ts
+│   │   │   │   │   │   │   ├── collection.interface.ts
+│   │   │   │   │   │   │   └── marketplace.interface.ts
+│   │   │   │   │   │   └── pipes/
+│   │   │   │   │   │       ├── price-format.pipe.ts
+│   │   │   │   │   │       └── rarity-color.pipe.ts
+│   │   │   │   │   └── assets/
+│   │   │   │   │       └── images/
 │   │   │   │   │           ├── big-dog-front.png
 │   │   │   │   │           ├── big-dog-back.png
 │   │   │   │   │           ├── nft-*.svg
-│   │   │   │   │           └── battle-*.svg
+│   │   │   │   │           └── collections/
 │   │   │   │   └── project.json
 │   │   │   └── playerLandingPage/   # Player UI (port 4201)
 │   │   │       └── src/
@@ -209,6 +237,7 @@ Top Dog Arena/
 │   │   ├── colors.md
 │   │   └── style-guide.md
 │   ├── documentation/
+│   │   ├── AUTHENTICATION_GUIDE.md    # Complete NFT-backed card auth strategy
 │   │   ├── api-specs/
 │   │   ├── user-guides/
 │   │   └── technical-docs/
@@ -248,8 +277,9 @@ Top Dog Arena/
 ## Service Architecture
 
 ### Frontend Services
-- **Shell Application** (Port 4200): Main Top Dog Arena interface
+- **Shell Application** (Port 4200): Main Top Dog Arena interface and module federation host
 - **Player Landing Page** (Port 4201): Dedicated player management interface
+- **NFT Marketplace** (Port 4202): Standalone NFT marketplace micro-frontend with Big Dog showcase
 
 ### Backend Services
 - **NFT Service** (Port 8080): XRPL blockchain integration, minting, transfers
@@ -263,19 +293,44 @@ Top Dog Arena/
 - **Redis** (Port 6379): Caching and session management
 - **IPFS** (Port 5001): Decentralized file storage
 
+## Micro-Frontend Architecture
+
+### Module Federation Setup
+The Top Dog Arena uses Angular Module Federation to create a micro-frontend architecture:
+
+- **Shell Application (Host)**: Main container that loads remote modules
+- **NFT Marketplace (Remote)**: Independent NFT marketplace module 
+- **Player Landing Page (Remote)**: Player management interface
+
+### Remote Module Communication
+- **Shared State**: Redux/NgRx for cross-module state management
+- **Event Bus**: Custom event system for module-to-module communication
+- **Shared Services**: Common services exposed through the shell
+- **Theme Consistency**: Shared theme service ensures consistent styling
+
+### Development Workflow
+1. Each micro-frontend runs independently during development
+2. Shell application loads remotes via module federation
+3. Hot module replacement works across all modules
+4. Independent testing and deployment for each module
+
 ## Development Guidelines
 
 ### Port Allocation
 - **Frontend**: 4200-4299
+  - Shell (Host): 4200
+  - Player UI: 4201
+  - NFT Marketplace: 4202
+  - Future Micro-frontends: 4203-4299
 - **Backend APIs**: 8080-8099
 - **WebSocket Services**: 9000-9099
 - **Database Services**: 5000-5999
 - **Monitoring**: 3000-3999
 
 ### Environment Configuration
-- **Development**: Local Docker Compose
-- **Staging**: Kubernetes cluster
-- **Production**: Kubernetes with Terraform
+- **Development**: Local Docker Compose + Nx serve for micro-frontends
+- **Staging**: Kubernetes cluster with module federation
+- **Production**: Kubernetes with Terraform and CDN for micro-frontends
 
 ### File Naming Conventions
 - **Components**: kebab-case (e.g., `nft-marketplace.component.ts`)
@@ -285,19 +340,25 @@ Top Dog Arena/
 - **Docker**: kebab-case (e.g., `nft-service`)
 
 ## Current Status
-- ✅ Frontend Shell (Angular) - Running
-- ✅ NFT Marketplace UI - Implemented with flip animation
+- ✅ Frontend Shell (Angular) - Running on port 4200
+- ✅ NFT Marketplace - Ready to extract as micro-frontend (port 4202)
+- ✅ Big Dog NFT flip animation - Implemented and working
 - ✅ Asset management - Local SVG/PNG assets configured
+- ✅ Module Federation setup - Ready for micro-frontend architecture
 - 🔄 Backend services - Planned
 - 🔄 Database schema - Planned
 - 🔄 Docker configuration - Planned
 
 ## Next Steps
-1. Initialize backend service directories
-2. Set up database schema and migrations
-3. Implement Docker Compose for development
-4. Create API specifications
-5. Set up CI/CD pipeline
+1. **Extract NFT Marketplace as separate Nx project** 
+   - Move components from shell to nft-marketplace project
+   - Configure module federation for remote loading
+   - Set up independent deployment pipeline
+2. Initialize backend service directories
+3. Set up database schema and migrations
+4. Implement Docker Compose for development
+5. Create API specifications
+6. Set up CI/CD pipeline for micro-frontends
 
 ---
 *Last updated: July 19, 2025*
