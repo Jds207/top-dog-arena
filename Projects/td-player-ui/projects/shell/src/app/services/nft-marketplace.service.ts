@@ -636,6 +636,12 @@ export class NFTMarketplaceService {
       const stored = localStorage.getItem(this.MARKETPLACE_STORAGE_KEY);
       if (stored) {
         const data = JSON.parse(stored);
+        // Check if stored data has old via.placeholder URLs and clear if so
+        if (data.nfts && data.nfts.some((nft: any) => nft.image?.includes('via.placeholder'))) {
+          console.log('Clearing outdated localStorage with via.placeholder URLs');
+          localStorage.removeItem(this.MARKETPLACE_STORAGE_KEY);
+          return; // Use fresh mockNFTs instead
+        }
         if (data.nfts) this.nfts.set(data.nfts);
         if (data.collections) this.collections.set(data.collections);
       }

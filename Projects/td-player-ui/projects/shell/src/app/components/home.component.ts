@@ -72,14 +72,14 @@ export class HomeComponent implements OnInit {
     leftPlayer: {
       id: 'player-meme-king',
       name: 'Meme King',
-      thumbnailUrl: 'https://via.placeholder.com/300x200/f97316/ffffff?text=Meme+King',
+      thumbnailUrl: 'assets/images/battle-meme-king.svg',
       memePreview: 'When you realize you\'re the Top Dog of the arena',
       votes: 1847
     },
     rightPlayer: {
       id: 'player-comedy-queen',
       name: 'Comedy Queen',
-      thumbnailUrl: 'https://via.placeholder.com/300x200/ef4444/ffffff?text=Comedy+Queen', 
+      thumbnailUrl: 'assets/images/battle-comedy-queen.svg', 
       memePreview: 'That moment when your meme breaks the internet',
       votes: 1523
     },

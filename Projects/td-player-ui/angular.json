@@ -28,6 +28,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/shell/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/shell/src/assets",
+                "output": "assets"
               }
             ],
             "styles": ["projects/shell/src/styles.scss"],
@@ -95,6 +100,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/shell/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/shell/src/assets",
+                "output": "assets"
               }
             ],
             "styles": ["projects/shell/src/styles.scss"]
@@ -127,6 +137,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/player-landing-page/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/player-landing-page/src/assets",
+                "output": "assets"
               }
             ],
             "styles": ["projects/player-landing-page/src/styles.scss"],
