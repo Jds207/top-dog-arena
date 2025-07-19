@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ComingSoonComponent } from '../coming-soon.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-leaderboard',
@@ -15,7 +16,13 @@ import { ComingSoonComponent } from '../coming-soon.component';
     </coming-soon>
   `
 })
-export class LeaderboardComponent {
+export class LeaderboardComponent implements OnInit {
+  
+  constructor(private titleService: Title) {}
+  
+  ngOnInit(): void {
+    this.titleService.setTitle('Leaderboard - Coming Soon | Top Dog Arena');
+  }
   leaderboardFeatures = [
     { icon: '🌍', name: 'Global Rankings', description: 'Worldwide player standings' },
     { icon: '📈', name: 'Player Statistics', description: 'Detailed performance metrics' },

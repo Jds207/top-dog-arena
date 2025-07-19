@@ -2,6 +2,7 @@ import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { NFTMarketplaceService, NFT, NFTCollection } from '../../services/nft-marketplace.service';
 
 @Component({
@@ -53,10 +54,12 @@ export class NftMarketplaceComponent implements OnInit {
 
   constructor(
     private marketplaceService: NFTMarketplaceService,
-    private router: Router
+    private router: Router,
+    private titleService: Title
   ) {}
 
   ngOnInit(): void {
+    this.titleService.setTitle('NFT Marketplace - Top Dog Baseball Cards | Top Dog Arena');
     // Load initial data if needed
   }
 

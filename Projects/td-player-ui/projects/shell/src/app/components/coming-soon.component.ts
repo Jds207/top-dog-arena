@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'coming-soon',
@@ -169,12 +170,18 @@ import { RouterModule } from '@angular/router';
     }
   `]
 })
-export class ComingSoonComponent {
+export class ComingSoonComponent implements OnInit {
   @Input() pageTitle: string = 'Feature';
   @Input() pageIcon: string = '🚧';
   @Input() description: string = 'This exciting feature is under development and will be available soon.';
   @Input() progressPercentage: number = 25;
   @Input() features: Array<{icon: string, name: string, description: string}> = [];
+  
+  constructor(private titleService: Title) {}
+  
+  ngOnInit(): void {
+    this.titleService.setTitle(`${this.pageTitle} - Coming Soon | Top Dog Arena`);
+  }
   
   onNotifyMe(): void {
     // TODO: Implement notification signup

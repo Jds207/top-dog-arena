@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 // Import Arena Components
 import { ArenaBannerComponent } from './arena/arena-banner.component';
@@ -57,7 +58,13 @@ interface FooterStats {
     }
   `]
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+
+  constructor(private titleService: Title) {}
+
+  ngOnInit(): void {
+    this.titleService.setTitle('Top Dog Arena - Battle Arena & NFT Marketplace');
+  }
   
   // Mock data for current battle
   currentBattle: Battle = {

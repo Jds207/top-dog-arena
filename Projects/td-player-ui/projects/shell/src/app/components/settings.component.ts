@@ -1,6 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { ThemeService, type Theme } from '../services/theme.service';
 import { SettingsService } from '../services/settings.service';
 import { ThemeSelectorComponent } from './theme-selector.component';
@@ -686,7 +687,7 @@ type SettingsTab = 'profile' | 'appearance' | 'gameplay' | 'notifications' | 'pr
     }
   `]
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
   // Tab management
   readonly activeTab = signal<SettingsTab>('profile');
 
@@ -707,8 +708,13 @@ export class SettingsComponent {
 
   constructor(
     private readonly themeService: ThemeService,
-    private readonly settingsService: SettingsService
+    private readonly settingsService: SettingsService,
+    private titleService: Title
   ) {}
+
+  ngOnInit(): void {
+    this.titleService.setTitle('Settings - Customize Your Experience | Top Dog Arena');
+  }
 
   // Profile methods
   updateProfile(updates: any): void {
