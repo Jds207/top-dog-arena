@@ -15,47 +15,51 @@ interface ArenaStats {
   template: `
     <section class="stats-section mb-8">
       <div class="text-center mb-8">
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+        <h2 class="text-2xl md:text-3xl font-bold mb-2" style="color: rgb(var(--color-text-primary));">
           📊 Arena Statistics
         </h2>
-        <p class="text-orange-300">Live stats from the battlefield</p>
+        <p style="color: #f97316;">Live stats from the battlefield</p>
       </div>
       
       <!-- Desktop Layout -->
       <div class="hidden md:grid md:grid-cols-4 gap-6">
-        <div class="stat-card bg-slate-800 rounded-xl p-6 text-center border border-slate-600 hover:border-orange-500/50 transition-all duration-300">
+        <div class="stat-card rounded-xl p-6 text-center border transition-all duration-300 hover:border-orange-500/50" 
+             style="background-color: rgb(var(--color-bg-tertiary)); border-color: rgb(var(--color-border));">
           <div class="stat-icon text-4xl mb-4">🗳️</div>
-          <div class="stat-value text-3xl font-bold text-orange-500 mb-2">
+          <div class="stat-value text-3xl font-bold mb-2" style="color: #f97316;">
             {{ formatNumber(stats.totalVotesThisMonth) }}
           </div>
-          <div class="stat-label text-slate-300 text-sm">
+          <div class="stat-label text-sm" style="color: rgb(var(--color-text-secondary));">
             Votes This Month
           </div>
         </div>
         
-        <div class="stat-card bg-slate-800 rounded-xl p-6 text-center border border-slate-600 hover:border-orange-500/50 transition-all duration-300">
+        <div class="stat-card rounded-xl p-6 text-center border transition-all duration-300 hover:border-orange-500/50" 
+             style="background-color: rgb(var(--color-bg-tertiary)); border-color: rgb(var(--color-border));">
           <div class="stat-icon text-4xl mb-4">🐕</div>
-          <div class="stat-value text-3xl font-bold text-orange-500 mb-2">
+          <div class="stat-value text-3xl font-bold mb-2" style="color: #f97316;">
             {{ stats.activeTopDogs }}
           </div>
-          <div class="stat-label text-slate-300 text-sm">
+          <div class="stat-label text-sm" style="color: rgb(var(--color-text-secondary));">
             Active Top Dogs
           </div>
         </div>
         
-        <div class="stat-card bg-slate-800 rounded-xl p-6 text-center border border-slate-600 hover:border-orange-500/50 transition-all duration-300">
+        <div class="stat-card rounded-xl p-6 text-center border transition-all duration-300 hover:border-orange-500/50" 
+             style="background-color: rgb(var(--color-bg-tertiary)); border-color: rgb(var(--color-border));">
           <div class="stat-icon text-4xl mb-4">👑</div>
-          <div class="stat-value text-lg font-bold text-orange-500 mb-2">
+          <div class="stat-value text-lg font-bold mb-2" style="color: #f97316;">
             {{ stats.mostVotedPlayer }}
           </div>
-          <div class="stat-label text-slate-300 text-sm">
+          <div class="stat-label text-sm" style="color: rgb(var(--color-text-secondary));">
             Most Voted Player
           </div>
         </div>
         
-        <div class="stat-card bg-slate-800 rounded-xl p-6 text-center border border-slate-600 hover:border-orange-500/50 transition-all duration-300">
+        <div class="stat-card rounded-xl p-6 text-center border transition-all duration-300 hover:border-orange-500/50" 
+             style="background-color: rgb(var(--color-bg-tertiary)); border-color: rgb(var(--color-border));">
           <div class="stat-icon text-4xl mb-4">⚔️</div>
-          <div class="stat-value text-3xl font-bold text-orange-500 mb-2">
+          <div class="stat-value text-3xl font-bold mb-2" style="color: #f97316;">
             {{ stats.contestsThisWeek }}
           </div>
           <div class="stat-label text-slate-300 text-sm">

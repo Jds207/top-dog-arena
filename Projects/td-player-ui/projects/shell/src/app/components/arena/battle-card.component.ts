@@ -22,12 +22,13 @@ interface Battle {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="battle-panel bg-slate-900 rounded-2xl border border-orange-500/30 p-6 mb-8">
+    <section class="battle-panel rounded-2xl border p-6 mb-8"
+             style="background: linear-gradient(135deg, rgba(var(--color-bg-secondary), 0.9), rgba(var(--color-bg-tertiary), 0.8)); border-color: rgba(249, 115, 22, 0.3); backdrop-filter: blur(10px);">
       <div class="text-center mb-6">
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">
+        <h2 class="text-2xl md:text-3xl font-bold mb-2" style="color: rgb(var(--color-text-primary));">
           ⚔️ Featured Battle
         </h2>
-        <p class="text-orange-300">Vote for your favorite Top Dog!</p>
+        <p style="color: #f97316;">Vote for your favorite Top Dog!</p>
       </div>
       
       <div class="battle-container grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
@@ -36,17 +37,17 @@ interface Battle {
              (click)="onVote(battle.leftPlayer.id)"
              (mouseenter)="hoveredPlayer = 'left'"
              (mouseleave)="hoveredPlayer = null">
-          <div class="player-card bg-slate-800 rounded-xl p-4 border-2 transition-all duration-300"
-               [class.border-orange-500]="hoveredPlayer === 'left'"
-               [class.border-slate-600]="hoveredPlayer !== 'left'">
+          <div class="player-card rounded-xl p-4 border-2 transition-all duration-300"
+               style="background-color: rgb(var(--color-bg-tertiary));"
+               [style.border-color]="hoveredPlayer === 'left' ? '#f97316' : 'rgb(var(--color-border))'">
             <div class="player-thumbnail mb-4 relative overflow-hidden rounded-lg">
               <img [src]="battle.leftPlayer.thumbnailUrl" 
                    [alt]="battle.leftPlayer.name"
                    class="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2">{{ battle.leftPlayer.name }}</h3>
-            <div class="meme-preview text-sm text-slate-300 mb-3 italic">
+            <h3 class="text-lg font-bold mb-2" style="color: rgb(var(--color-text-primary));">{{ battle.leftPlayer.name }}</h3>
+            <div class="meme-preview text-sm mb-3 italic" style="color: rgb(var(--color-text-secondary));">
               "{{ battle.leftPlayer.memePreview }}"
             </div>
             <button class="vote-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition-colors w-full">
@@ -57,19 +58,19 @@ interface Battle {
 
         <!-- VS Section -->
         <div class="vs-section text-center">
-          <div class="text-4xl md:text-6xl font-bold text-orange-500 mb-4">VS</div>
+          <div class="text-4xl md:text-6xl font-bold mb-4" style="color: #f97316;">VS</div>
           
           <!-- Progress Bar -->
           <div class="vote-progress mb-4">
-            <div class="flex justify-between text-sm text-slate-300 mb-2">
+            <div class="flex justify-between text-sm mb-2" style="color: rgb(var(--color-text-secondary));">
               <span>{{ leftPercentage }}%</span>
               <span>{{ rightPercentage }}%</span>
             </div>
-            <div class="progress-bar bg-slate-700 rounded-full h-4 overflow-hidden">
+            <div class="progress-bar rounded-full h-4 overflow-hidden" style="background-color: rgb(var(--color-bg-tertiary));">
               <div class="progress-left bg-orange-500 h-full transition-all duration-500"
                    [style.width.%]="leftPercentage"></div>
             </div>
-            <div class="text-xs text-slate-400 mt-2">
+            <div class="text-xs mt-2" style="color: rgb(var(--color-text-muted));">
               {{ battle.totalVotes }} total votes
             </div>
           </div>
@@ -80,17 +81,17 @@ interface Battle {
              (click)="onVote(battle.rightPlayer.id)"
              (mouseenter)="hoveredPlayer = 'right'"
              (mouseleave)="hoveredPlayer = null">
-          <div class="player-card bg-slate-800 rounded-xl p-4 border-2 transition-all duration-300"
-               [class.border-orange-500]="hoveredPlayer === 'right'"
-               [class.border-slate-600]="hoveredPlayer !== 'right'">
+          <div class="player-card rounded-xl p-4 border-2 transition-all duration-300"
+               style="background-color: rgb(var(--color-bg-tertiary));"
+               [style.border-color]="hoveredPlayer === 'right' ? '#f97316' : 'rgb(var(--color-border))'">
             <div class="player-thumbnail mb-4 relative overflow-hidden rounded-lg">
               <img [src]="battle.rightPlayer.thumbnailUrl" 
                    [alt]="battle.rightPlayer.name"
                    class="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2">{{ battle.rightPlayer.name }}</h3>
-            <div class="meme-preview text-sm text-slate-300 mb-3 italic">
+            <h3 class="text-lg font-bold mb-2" style="color: rgb(var(--color-text-primary));">{{ battle.rightPlayer.name }}</h3>
+            <div class="meme-preview text-sm mb-3 italic" style="color: rgb(var(--color-text-secondary));">
               "{{ battle.rightPlayer.memePreview }}"
             </div>
             <button class="vote-btn bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg transition-colors w-full">

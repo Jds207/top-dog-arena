@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 
 // Import Arena Components
 import { ArenaBannerComponent } from './arena/arena-banner.component';
@@ -44,7 +43,6 @@ interface FooterStats {
   standalone: true,
   imports: [
     CommonModule, 
-    RouterLink, 
     ArenaBannerComponent, 
     BattleCardComponent, 
     StatsPanelComponent, 

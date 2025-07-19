@@ -7,15 +7,17 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <section class="relative w-screen left-1/2 -translate-x-1/2 mb-8">
-      <div class="arena-banner-container bg-gradient-to-br from-slate-900 via-slate-800 to-orange-900 p-8 text-center">
+      <div class="arena-banner-container p-8 text-center" 
+           style="background: linear-gradient(135deg, rgb(var(--color-bg-primary)), rgb(var(--color-bg-secondary)), rgb(var(--color-bg-tertiary)));">
         <div class="max-w-4xl mx-auto">
-          <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 text-glow arena-title">
+          <h1 class="text-4xl md:text-6xl font-bold mb-4 text-glow arena-title"
+              style="color: rgb(var(--color-text-primary));">
             🏟️ {{ contestTitle }}
           </h1>
-          <div class="text-xl md:text-2xl text-orange-300 mb-2">
+          <div class="text-xl md:text-2xl mb-2" style="color: #f97316;">
             {{ startDate }} - {{ endDate }}
           </div>
-          <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+          <p class="text-lg max-w-2xl mx-auto" style="color: rgb(var(--color-text-secondary));">
             {{ tagline }}
           </p>
         </div>

@@ -14,6 +14,16 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tournaments',
+    loadComponent: () =>
+      import('./components/tournaments/tournaments.component').then((m) => m.TournamentsComponent),
+  },
+  {
+    path: 'leaderboard',
+    loadComponent: () =>
+      import('./components/leaderboard/leaderboard.component').then((m) => m.LeaderboardComponent),
+  },
+  {
     path: 'settings',
     loadComponent: () =>
       import('./components/settings.component').then((m) => m.SettingsComponent),
