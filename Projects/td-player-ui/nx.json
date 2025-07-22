@@ -21,6 +21,5 @@
       "!{projectRoot}/tsconfig.spec.json",
       "!{projectRoot}/**/*.spec.[jt]s"
     ]
-  },
-  "nxCloudId": "6879d80a7929766c0cd4112e"
+  }
 }

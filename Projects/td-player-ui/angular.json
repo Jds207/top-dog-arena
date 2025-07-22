@@ -15,12 +15,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-architects/module-federation:build",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "customWebpackConfig": {
-              "path": "projects/shell/webpack.config.js"
-            },
-            "browser": "projects/shell/src/main.ts",
+            "outputPath": "dist/shell",
+            "index": "projects/shell/src/index.html",
+            "main": "projects/shell/src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "projects/shell/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -35,12 +34,7 @@
                 "output": "assets"
               }
             ],
-            "styles": ["projects/shell/src/styles.scss"],
-            "server": "projects/shell/src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "projects/shell/src/server.ts"
-            }
+            "styles": ["projects/shell/src/styles.scss"]
           },
           "configurations": {
             "production": {
@@ -67,7 +61,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "shell:build:production"
@@ -86,7 +80,7 @@
           "options": {
             "lintFilePatterns": [
               "projects/shell/**/*.ts",
-              "projects/shell/**/*.html"
+              "projects/shell/**/Top Dog Arena"
             ]
           }
         },
@@ -124,11 +118,8 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-architects/module-federation:build",
+          "builder": "@angular-architects/native-federation:build",
           "options": {
-            "customWebpackConfig": {
-              "path": "projects/player-landing-page/webpack.config.js"
-            },
             "browser": "projects/player-landing-page/src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "projects/player-landing-page/tsconfig.app.json",
@@ -176,7 +167,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "playerLandingPage:build:production"
@@ -195,7 +186,7 @@
           "options": {
             "lintFilePatterns": [
               "projects/player-landing-page/**/*.ts",
-              "projects/player-landing-page/**/*.html"
+              "projects/player-landing-page/**/Top Dog Arena"
             ]
           }
         },
@@ -212,6 +203,122 @@
               }
             ],
             "styles": ["projects/player-landing-page/src/styles.scss"]
+          }
+        }
+      }
+    },
+    "nft-marketplace": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "projects/nft-marketplace",
+      "sourceRoot": "projects/nft-marketplace/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-architects/native-federation:build",
+          "options": {
+            "browser": "projects/nft-marketplace/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/nft-marketplace/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/nft-marketplace/public"
+              }
+            ],
+            "styles": [
+              "projects/nft-marketplace/src/styles.scss"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "port": 4202
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "nft-marketplace:build:production"
+            },
+            "development": {
+              "buildTarget": "nft-marketplace:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/nft-marketplace/tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/nft-marketplace/public"
+              }
+            ],
+            "styles": [
+              "projects/nft-marketplace/src/styles.scss"
+            ]
           }
         }
       }

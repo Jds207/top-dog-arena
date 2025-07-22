@@ -24,11 +24,6 @@
           }
         ],
         "styles": ["projects/shell/src/styles.scss"],
-        "server": "projects/shell/src/main.server.ts",
-        "outputMode": "server",
-        "ssr": {
-          "entry": "projects/shell/src/server.ts"
-        },
         "outputPath": "dist/shell"
       },
       "configurations": {

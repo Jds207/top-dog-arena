@@ -1,0 +1,48 @@
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T16:21:16.648Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T16:21:41.396Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T16:21:49.266Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T16:27:23.896Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T16:27:58.112Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T18:09:22.009Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T18:12:37.933Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T18:15:09.773Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T18:30:30.083Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T18:32:23.783Z"}
+{"level":"info","message":"🎨 Created NFT record: 000800006C17D64B064AFCF2F36CA70349DF644CA3529DB2A4F98199008B19FE","timestamp":"2025-07-22T18:34:00.093Z"}
+{"level":"info","message":"📋 Logged transaction: 2DB65A2199475DA6CD0CA4F27EAAF639D1012087C937CD296BAF4D621BA4E0B7","timestamp":"2025-07-22T18:34:00.116Z"}
+{"level":"info","message":"✅ Database connection established","timestamp":"2025-07-22T19:42:22.292Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T19:42:22.293Z"}
+{"level":"info","message":"✅ Connected to XRPL testnet","timestamp":"2025-07-22T19:42:22.898Z"}
+{"level":"info","message":"✅ XRPL wallet initialized: rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b","timestamp":"2025-07-22T19:42:23.121Z"}
+{"level":"info","message":"💰 Wallet balance: 29999916 drops (28799916 available)","timestamp":"2025-07-22T19:42:23.232Z"}
+{"level":"info","message":"✅ XRPL client initialized successfully","timestamp":"2025-07-22T19:42:23.233Z"}
+{"level":"info","message":"🚀 Top Dog Arena Backend Server running on port 3000","timestamp":"2025-07-22T19:42:23.239Z"}
+{"level":"info","message":"📊 Environment: development","timestamp":"2025-07-22T19:42:23.241Z"}
+{"level":"info","message":"🌐 XRPL Network: testnet","timestamp":"2025-07-22T19:42:23.242Z"}
+{"level":"info","message":"⚡ Health check: http://localhost:3000/api/health","timestamp":"2025-07-22T19:42:23.244Z"}
+{"duration":"1ms","ip":"::1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753213417040_ncasbd2xd","statusCode":404,"timestamp":"2025-07-22T19:43:37.042Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.102.1 Chrome/134.0.6998.205 Electron/35.6.0 Safari/537.36"}
+{"level":"info","message":"✅ Database connection established","timestamp":"2025-07-22T19:59:48.807Z"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T19:59:48.810Z"}
+{"level":"info","message":"✅ Connected to XRPL testnet","timestamp":"2025-07-22T19:59:49.450Z"}
+{"level":"info","message":"✅ XRPL wallet initialized: rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b","timestamp":"2025-07-22T19:59:49.720Z"}
+{"level":"info","message":"💰 Wallet balance: 29999916 drops (28799916 available)","timestamp":"2025-07-22T19:59:49.861Z"}
+{"level":"info","message":"✅ XRPL client initialized successfully","timestamp":"2025-07-22T19:59:49.862Z"}
+{"level":"info","message":"🚀 Top Dog Arena Backend Server running on port 3000","timestamp":"2025-07-22T19:59:49.867Z"}
+{"level":"info","message":"📊 Environment: development","timestamp":"2025-07-22T19:59:49.868Z"}
+{"level":"info","message":"🌐 XRPL Network: testnet","timestamp":"2025-07-22T19:59:49.869Z"}
+{"level":"info","message":"⚡ Health check: http://localhost:3000/api/health","timestamp":"2025-07-22T19:59:49.871Z"}
+{"duration":"1ms","ip":"::1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214390078_p07n9nlj6","statusCode":404,"timestamp":"2025-07-22T19:59:50.080Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"duration":"0ms","ip":"::1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214393628_dz4cono6a","statusCode":404,"timestamp":"2025-07-22T19:59:53.629Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"duration":"0ms","ip":"::1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214395885_yqsbjflcj","statusCode":404,"timestamp":"2025-07-22T19:59:55.886Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"duration":"1ms","ip":"::1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214402731_6j58v4ela","statusCode":200,"timestamp":"2025-07-22T20:00:02.733Z","userAgent":"Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.4652"}
+{"duration":"0ms","ip":"::ffff:127.0.0.1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214430860_m2qrycbyv","statusCode":200,"timestamp":"2025-07-22T20:00:30.861Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"duration":"0ms","ip":"::ffff:127.0.0.1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214436066_578b74vy9","statusCode":404,"timestamp":"2025-07-22T20:00:36.067Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"duration":"0ms","ip":"::1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214441499_fpb0oxfgs","statusCode":404,"timestamp":"2025-07-22T20:00:41.500Z","userAgent":"Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.4652"}
+{"level":"info","message":"💰 Wallet balance: 29999916 drops (28799916 available)","timestamp":"2025-07-22T20:00:58.636Z"}
+{"duration":"125ms","ip":"::1","level":"info","message":"GET /detailed","method":"GET","path":"/detailed","requestId":"req_1753214458511_dlg62ql3r","statusCode":200,"timestamp":"2025-07-22T20:00:58.637Z","userAgent":"Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.4652"}
+{"level":"info","message":"💰 Wallet balance: 29999916 drops (28799916 available)","timestamp":"2025-07-22T20:01:08.866Z"}
+{"duration":"117ms","ip":"::1","level":"info","message":"GET /detailed","method":"GET","path":"/detailed","requestId":"req_1753214468750_hf5zfro7l","statusCode":200,"timestamp":"2025-07-22T20:01:08.868Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"level":"info","message":"💰 Wallet balance: 29999916 drops (28799916 available)","timestamp":"2025-07-22T20:01:35.543Z"}
+{"duration":"109ms","ip":"::1","level":"info","message":"GET /detailed","method":"GET","path":"/detailed","requestId":"req_1753214495435_3dmuzzxom","statusCode":200,"timestamp":"2025-07-22T20:01:35.544Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"duration":"0ms","ip":"::1","level":"info","message":"GET /","method":"GET","path":"/","requestId":"req_1753214497787_1bk072yq3","statusCode":404,"timestamp":"2025-07-22T20:01:37.795Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"}
+{"level":"info","message":"✅ Database connected successfully","timestamp":"2025-07-22T20:02:19.998Z"}

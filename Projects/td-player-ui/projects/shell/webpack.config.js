@@ -1,20 +1,17 @@
-const {
-  shareAll,
-  withModuleFederationPlugin,
-} = require("@angular-architects/module-federation/webpack");
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
-module.exports = withModuleFederationPlugin({
-  name: "shell",
-
-  remotes: {
-    playerLandingPage: "http://localhost:4201/remoteEntry.js",
-  },
-
-  shared: {
-    ...shareAll({
-      singleton: true,
-      strictVersion: true,
-      requiredVersion: "auto",
+module.exports = {
+  mode: "development",
+  plugins: [
+    new ModuleFederationPlugin({
+      name: "shell",
+      remotes: {
+        nftMarketplace: "nftMarketplace@http://localhost:4202/remoteEntry.js",
+      },
+      shared: {
+        "@angular/core": { singleton: true },
+        "@angular/common": { singleton: true },
+      },
     }),
-  },
-});
+  ],
+};

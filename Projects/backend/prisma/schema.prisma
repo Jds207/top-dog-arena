@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// XRPL Account information
+model Account {
+  id          String   @id @default(cuid())
+  address     String   @unique // XRPL wallet address (rXXXXX...)
+  seed        String?  // Encrypted wallet seed (optional, for owned wallets)
+  publicKey   String?  // XRPL public key
+  privateKey  String?  // Encrypted private key (optional, for owned wallets)
+  network     String   @default("testnet") // testnet, mainnet, devnet
+  balance     String?  // Balance in drops
+  balanceXRP  String?  // Balance in XRP (human readable)
+  isOwned     Boolean  @default(false) // Whether this wallet is owned by our service
+  isActive    Boolean  @default(true)
+  
+  // Metadata
+  nickname    String?  // Optional nickname for the account
+  description String?  // Optional description
+  tags        String?  // JSON array of tags
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastSyncAt  DateTime? // Last time we synced data from XRPL
+  
+  // Relations
+  nftsOwned   NFT[]    @relation("NFTOwner")
+  nftsIssued  NFT[]    @relation("NFTIssuer")
+  
+  @@map("accounts")
+}
+
+// NFT information from XRPL
+model NFT {
+  id             String   @id @default(cuid())
+  nftTokenID     String   @unique // XRPL NFTokenID (64-character hex)
+  issuerAddress  String   // Address that minted the NFT
+  ownerAddress   String   // Current owner address
+  
+  // XRPL NFT properties
+  flags          Int?     // NFT flags
+  transferFee    Int?     // Transfer fee in 1/100,000th units
+  nftTaxon       Int?     // NFT Taxon
+  nftSerial      Int?     // NFT Serial number
+  uri            String?  // Hex-encoded metadata URI
+  
+  // Decoded metadata (from URI)
+  name           String?
+  description    String?
+  imageUrl       String?
+  imageHash      String?  // IPFS hash if using IPFS
+  animationUrl   String?
+  externalUrl    String?
+  attributes     String?  // JSON array of trait objects
+  
+  // Transaction information
+  txHash         String?  // Transaction hash when minted
+  ledgerIndex    Int?     // Ledger index when minted
+  fee            String?  // Transaction fee in drops
+  
+  // Status and flags
+  isBurned       Boolean  @default(false)
+  isTransferable Boolean  @default(true)
+  
+  // Top Dog Arena specific fields
+  category       String?  // baseball_card, collectible, etc.
+  rarity         String?  // common, uncommon, rare, legendary
+  season         String?  // e.g., "2024"
+  player         String?  // Player name for baseball cards
+  team           String?  // Team name for baseball cards
+  position       String?  // Player position
+  
+  // Marketplace data
+  isForSale      Boolean  @default(false)
+  priceXRP       String?  // Sale price in XRP
+  priceDrop      String?  // Sale price in drops
+  marketplaceUrl String?  // URL to marketplace listing
+  
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  mintedAt       DateTime? // When the NFT was minted on XRPL
+  lastSyncAt     DateTime? // Last time we synced from XRPL
+  
+  // Relations
+  issuer         Account  @relation("NFTIssuer", fields: [issuerAddress], references: [address])
+  owner          Account  @relation("NFTOwner", fields: [ownerAddress], references: [address])
+  
+  @@map("nfts")
+}
+
+// Transaction log for XRPL operations
+model Transaction {
+  id            String   @id @default(cuid())
+  txHash        String   @unique // XRPL transaction hash
+  txType        String   // NFTokenMint, NFTokenBurn, NFTokenAcceptOffer, etc.
+  
+  // Transaction details
+  account       String   // Account that submitted the transaction
+  fee           String   // Transaction fee in drops
+  sequence      Int?     // Account sequence number
+  ledgerIndex   Int?     // Ledger index where transaction was included
+  
+  // NFT-specific fields
+  nftTokenID    String?  // Related NFT Token ID
+  amount        String?  // Amount in transaction (for offers/sales)
+  destination   String?  // Destination account (for transfers)
+  
+  // Status
+  validated     Boolean  @default(false) // Whether transaction was validated
+  successful    Boolean  @default(false) // Whether transaction was successful
+  errorCode     String?  // Error code if failed
+  errorMessage  String?  // Error message if failed
+  
+  // Metadata
+  memo          String?  // Transaction memo
+  metadata      String?  // Additional JSON metadata
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  submittedAt   DateTime? // When transaction was submitted to XRPL
+  validatedAt   DateTime? // When transaction was validated by XRPL
+  
+  @@map("transactions")
+}
+
+// API usage tracking
+model APIKey {
+  id            String   @id @default(cuid())
+  keyHash       String   @unique // Hashed API key
+  name          String   // Friendly name for the key
+  
+  // Usage limits
+  rateLimit     Int      @default(100) // Requests per window
+  windowMinutes Int      @default(15)  // Rate limit window in minutes
+  
+  // Permissions
+  canCreateNFT  Boolean  @default(true)
+  canViewNFT    Boolean  @default(true)
+  canManageAccount Boolean @default(false)
+  
+  // Status
+  isActive      Boolean  @default(true)
+  lastUsedAt    DateTime?
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  expiresAt     DateTime?
+  
+  @@map("api_keys")
+}
+
+// API request log
+model APIRequest {
+  id          String   @id @default(cuid())
+  endpoint    String   // API endpoint called
+  method      String   // HTTP method
+  ipAddress   String   // Client IP address
+  userAgent   String?  // Client User-Agent
+  apiKeyHash  String?  // API key used (if any)
+  
+  // Request details
+  requestSize Int?     // Request body size in bytes
+  responseSize Int?    // Response body size in bytes
+  statusCode  Int      // HTTP status code
+  responseTime Int     // Response time in milliseconds
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  @@map("api_requests")
+}

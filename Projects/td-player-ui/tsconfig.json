@@ -35,6 +35,12 @@
     },
     {
       "path": "./projects/player-landing-page/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/nft-marketplace/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/nft-marketplace/tsconfig.spec.json"
     }
   ]
 }

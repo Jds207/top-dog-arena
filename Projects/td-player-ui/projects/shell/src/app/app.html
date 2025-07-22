@@ -59,6 +59,15 @@
           <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></div>
         </a>
         
+        <a routerLink="/xrpl-connect" 
+           class="group relative px-3 py-2 xl:px-4 xl:py-3 font-semibold text-base xl:text-lg transition-all duration-300 nav-link">
+          <span class="flex items-center space-x-2">
+            <span class="text-lg xl:text-xl">🔗</span>
+            <span>Connect XRPL</span>
+          </span>
+          <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></div>
+        </a>
+        
         <a routerLink="/tournaments" 
            class="group relative px-3 py-2 xl:px-4 xl:py-3 font-semibold text-base xl:text-lg transition-all duration-300 nav-link">
           <span class="flex items-center space-x-2">
@@ -82,6 +91,33 @@
           <span class="flex items-center space-x-2">
             <span class="text-lg xl:text-xl">⚙️</span>
             <span>Settings</span>
+          </span>
+          <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></div>
+        </a>
+        
+        <a routerLink="/admin" 
+           class="group relative px-3 py-2 xl:px-4 xl:py-3 font-semibold text-base xl:text-lg transition-all duration-300 nav-link">
+          <span class="flex items-center space-x-2">
+            <span class="text-lg xl:text-xl">🔧</span>
+            <span>Admin</span>
+          </span>
+          <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></div>
+        </a>
+
+        <a routerLink="/data-explorer" 
+           class="group relative px-3 py-2 xl:px-4 xl:py-3 font-semibold text-base xl:text-lg transition-all duration-300 nav-link">
+          <span class="flex items-center space-x-2">
+            <span class="text-lg xl:text-xl">📊</span>
+            <span>Data Explorer</span>
+          </span>
+          <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></div>
+        </a>
+
+        <a routerLink="/nft-analytics" 
+           class="group relative px-3 py-2 xl:px-4 xl:py-3 font-semibold text-base xl:text-lg transition-all duration-300 nav-link">
+          <span class="flex items-center space-x-2">
+            <span class="text-lg xl:text-xl">📈</span>
+            <span>Analytics</span>
           </span>
           <div class="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></div>
         </a>
@@ -113,6 +149,11 @@
            title="NFT Marketplace">
           <span class="text-2xl">🎨</span>
         </a>
+        <a routerLink="/xrpl-connect" 
+           class="flex items-center justify-center w-12 h-12 text-white hover:text-orange-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+           title="Connect XRPL">
+          <span class="text-2xl">🔗</span>
+        </a>
         <a routerLink="/tournaments" 
            class="flex items-center justify-center w-12 h-12 text-white hover:text-orange-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
            title="Tournaments">
@@ -127,6 +168,16 @@
            class="flex items-center justify-center w-12 h-12 text-white hover:text-orange-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
            title="Settings">
           <span class="text-2xl">⚙️</span>
+        </a>
+        <a routerLink="/data-explorer" 
+           class="flex items-center justify-center w-12 h-12 text-white hover:text-orange-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+           title="Data Explorer">
+          <span class="text-2xl">📊</span>
+        </a>
+        <a routerLink="/nft-analytics" 
+           class="flex items-center justify-center w-12 h-12 text-white hover:text-orange-400 hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+           title="NFT Analytics">
+          <span class="text-2xl">📈</span>
         </a>
         <!-- Tablet CTA -->
         <a routerLink="/player-landing-page" 
@@ -209,6 +260,13 @@
         <span>NFT Marketplace</span>
       </a>
       
+      <a routerLink="/xrpl-connect" 
+         (click)="closeMobileMenu()"
+         class="mobile-nav-link flex items-center space-x-3 px-4 py-3 font-medium text-base sm:text-lg rounded-lg transition-all duration-200">
+        <span class="text-xl sm:text-2xl">🔗</span>
+        <span>Connect XRPL</span>
+      </a>
+      
       <a routerLink="/tournaments" 
          (click)="closeMobileMenu()"
          class="mobile-nav-link flex items-center space-x-3 px-4 py-3 font-medium text-base sm:text-lg rounded-lg transition-all duration-200">
@@ -228,6 +286,27 @@
          class="mobile-nav-link flex items-center space-x-3 px-4 py-3 font-medium text-base sm:text-lg rounded-lg transition-all duration-200">
         <span class="text-xl sm:text-2xl">⚙️</span>
         <span>Settings</span>
+      </a>
+      
+      <a routerLink="/admin" 
+         (click)="closeMobileMenu()"
+         class="mobile-nav-link flex items-center space-x-3 px-4 py-3 font-medium text-base sm:text-lg rounded-lg transition-all duration-200">
+        <span class="text-xl sm:text-2xl">🔧</span>
+        <span>Admin</span>
+      </a>
+      
+      <a routerLink="/data-explorer" 
+         (click)="closeMobileMenu()"
+         class="mobile-nav-link flex items-center space-x-3 px-4 py-3 font-medium text-base sm:text-lg rounded-lg transition-all duration-200">
+        <span class="text-xl sm:text-2xl">📊</span>
+        <span>Data Explorer</span>
+      </a>
+      
+      <a routerLink="/nft-analytics" 
+         (click)="closeMobileMenu()"
+         class="mobile-nav-link flex items-center space-x-3 px-4 py-3 font-medium text-base sm:text-lg rounded-lg transition-all duration-200">
+        <span class="text-xl sm:text-2xl">📈</span>
+        <span>NFT Analytics</span>
       </a>
       
       <!-- Mobile CTA -->

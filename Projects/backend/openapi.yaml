@@ -1,0 +1,844 @@
+openapi: 3.0.3
+info:
+  title: Top Dog Arena NFT API
+  description: |
+    RESTful API for creating and managing NFTs on the XRPL (XRP Ledger) for Top Dog Arena baseball card marketplace.
+    
+    ## Features
+    - Create single and batch NFTs on XRPL
+    - Query NFT details and ownership
+    - Health monitoring endpoints
+    - Rate limiting and validation
+    
+    ## Rate Limits
+    - General API: 100 requests per 15 minutes per IP
+    - NFT Creation: 10 requests per hour per IP  
+    - Batch Operations: 3 requests per hour per IP
+    - Read Operations: 200 requests per 15 minutes per IP
+    
+    ## XRPL Integration
+    This API integrates with the XRP Ledger to mint NFTs representing baseball cards and other collectibles.
+    
+  version: 1.0.0
+  contact:
+    name: Top Dog Arena
+    url: https://topdogarena.com
+    email: support@topdogarena.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server with full database integration
+  - url: http://localhost:3000
+    description: Development server base
+  - url: https://api.topdogarena.com/api
+    description: Production server
+
+tags:
+  - name: Health
+    description: API health check endpoints
+  - name: NFT
+    description: NFT creation and management operations
+  - name: Auth
+    description: Authentication endpoints (coming soon)
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Basic health check
+      description: Simple endpoint to verify API is running
+      operationId: getHealth
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                success: true
+                message: "Top Dog Arena API is running"
+                timestamp: "2025-07-21T03:29:05.442Z"
+                version: "1.0.0"
+
+  /health/detailed:
+    get:
+      tags:
+        - Health
+      summary: Detailed health check
+      description: Comprehensive health check including service status
+      operationId: getDetailedHealth
+      responses:
+        '200':
+          description: Detailed health information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedHealthResponse'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health/xrpl:
+    get:
+      tags:
+        - Health
+      summary: XRPL connection status
+      description: Check XRPL network connection and wallet status
+      operationId: getXRPLHealth
+      responses:
+        '200':
+          description: XRPL connection information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XRPLHealthResponse'
+        '503':
+          description: XRPL connection error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /nft/create:
+    post:
+      tags:
+        - NFT
+      summary: Create a single NFT
+      description: |
+        Creates a single NFT on the XRPL. Requires XRPL wallet to be configured.
+        
+        **Rate Limit:** 10 requests per hour per IP
+      operationId: createNFT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNFTRequest'
+            example:
+              name: "Mike Trout - Angels Superstar"
+              description: "A legendary baseball card featuring Mike Trout in his Angels uniform."
+              image: "https://topdogarena.com/images/cards/mike-trout-001.png"
+              attributes:
+                - trait_type: "Player"
+                  value: "Mike Trout"
+                - trait_type: "Team"
+                  value: "Los Angeles Angels"
+                - trait_type: "Position"
+                  value: "Center Field"
+                - trait_type: "Rarity"
+                  value: "Legendary"
+              external_url: "https://topdogarena.com/players/mike-trout"
+              transferFee: 500
+      responses:
+        '201':
+          description: NFT created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NFTCreatedResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitErrorResponse'
+        '503':
+          description: XRPL service not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /nft/batch-create:
+    post:
+      tags:
+        - NFT
+      summary: Create multiple NFTs in batch
+      description: |
+        Creates up to 10 NFTs in a single batch operation.
+        
+        **Rate Limit:** 3 requests per hour per IP
+      operationId: batchCreateNFTs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchCreateNFTRequest'
+      responses:
+        '201':
+          description: All NFTs created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchNFTResponse'
+        '207':
+          description: Partial success - some NFTs failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchNFTResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitErrorResponse'
+
+  /nft/{nftId}:
+    get:
+      tags:
+        - NFT
+      summary: Get NFT details by ID
+      description: Retrieve detailed information about a specific NFT
+      operationId: getNFTById
+      parameters:
+        - name: nftId
+          in: path
+          required: true
+          description: 64-character hexadecimal NFT ID
+          schema:
+            type: string
+            pattern: '^[0-9A-Fa-f]{64}$'
+            example: "000B013A95F14B0044F78A264E41713C64B5F89242540EE208C3098E00000D65"
+      responses:
+        '200':
+          description: NFT details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NFTDetailsResponse'
+        '400':
+          description: Invalid NFT ID format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: NFT not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /nft/account/{account}:
+    get:
+      tags:
+        - NFT
+      summary: Get NFTs owned by account
+      description: Retrieve all NFTs owned by a specific XRPL account
+      operationId: getAccountNFTs
+      parameters:
+        - name: account
+          in: path
+          required: true
+          description: XRPL account address
+          schema:
+            type: string
+            pattern: '^r[1-9A-HJ-NP-Za-km-z]{25,34}$'
+            example: "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+        - name: limit
+          in: query
+          description: Number of results to return (1-100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: marker
+          in: query
+          description: Pagination marker for next page
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account NFTs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountNFTsResponse'
+        '400':
+          description: Invalid account address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /nft/wallet/info:
+    get:
+      tags:
+        - NFT
+      summary: Get wallet information
+      description: Retrieve wallet and network configuration information
+      operationId: getWalletInfo
+      responses:
+        '200':
+          description: Wallet information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletInfoResponse'
+
+  /api/stats/nft:
+    get:
+      tags:
+        - NFT
+      summary: Get NFT collection statistics
+      description: Retrieve statistics about the NFT collection from the database
+      operationId: getNFTStats
+      responses:
+        '200':
+          description: NFT statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NFTStatsResponse'
+        '500':
+          description: Database error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register new user
+      description: Register a new user account (not implemented yet)
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+      responses:
+        '501':
+          description: Not implemented yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      description: Authenticate user and return access token (not implemented yet)
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '501':
+          description: Not implemented yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedResponse'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Top Dog Arena API is running"
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "1.0.0"
+
+    DetailedHealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+        environment:
+          type: string
+          enum: [development, production, test]
+        services:
+          type: object
+          properties:
+            api:
+              type: string
+              enum: [healthy, unhealthy]
+            xrpl:
+              type: string
+              enum: [connected, disconnected, not_configured, error]
+            database:
+              type: string
+              enum: [connected, disconnected, not_configured, error]
+
+    XRPLHealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        xrpl:
+          type: object
+          properties:
+            network:
+              type: string
+              enum: [mainnet, testnet, devnet]
+            serverUrl:
+              type: string
+              format: uri
+            walletAddress:
+              type: string
+              nullable: true
+            connected:
+              type: boolean
+            balance:
+              type: object
+              nullable: true
+              properties:
+                balance:
+                  type: string
+                  description: Total balance in drops
+                available:
+                  type: string
+                  description: Available balance in drops
+
+    CreateNFTRequest:
+      type: object
+      required:
+        - name
+        - description
+        - image
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Mike Trout - Angels Superstar"
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          example: "A legendary baseball card featuring Mike Trout"
+        image:
+          type: string
+          format: uri
+          example: "https://topdogarena.com/images/cards/mike-trout-001.png"
+        attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              trait_type:
+                type: string
+              value:
+                oneOf:
+                  - type: string
+                  - type: number
+          example:
+            - trait_type: "Player"
+              value: "Mike Trout"
+            - trait_type: "Team"
+              value: "Los Angeles Angels"
+        external_url:
+          type: string
+          format: uri
+        animation_url:
+          type: string
+          format: uri
+        transferFee:
+          type: integer
+          minimum: 0
+          maximum: 50000
+          description: Transfer fee in 1/100,000th units (10000 = 10%)
+        recipient:
+          type: string
+          pattern: '^r[1-9A-HJ-NP-Za-km-z]{25,34}$'
+          description: XRPL address to mint NFT to
+        flags:
+          type: integer
+          description: NFT flags (8 = transferable)
+
+    BatchCreateNFTRequest:
+      type: object
+      required:
+        - nfts
+      properties:
+        nfts:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/CreateNFTRequest'
+
+    NFTCreatedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            nftId:
+              type: string
+              example: "000B013A95F14B0044F78A264E41713C64B5F89242540EE208C3098E00000D65"
+            txHash:
+              type: string
+              example: "E3FE6EA3D48F0C2B639448020EA4F03D4F4F8BDBD2397B43FE71618E38D4B277"
+            fee:
+              type: string
+              example: "12"
+            metadata:
+              $ref: '#/components/schemas/NFTMetadata'
+        message:
+          type: string
+          example: "NFT created successfully"
+
+    BatchNFTResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            successful:
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    type: integer
+                  nftId:
+                    type: string
+                  txHash:
+                    type: string
+                  fee:
+                    type: string
+                  metadata:
+                    $ref: '#/components/schemas/NFTMetadata'
+            failed:
+              type: array
+              items:
+                type: object
+                properties:
+                  index:
+                    type: integer
+                  error:
+                    type: string
+                  nftData:
+                    type: object
+            summary:
+              type: object
+              properties:
+                total:
+                  type: integer
+                successful:
+                  type: integer
+                failed:
+                  type: integer
+        message:
+          type: string
+
+    NFTDetailsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            nft_id:
+              type: string
+            ledger_index:
+              type: integer
+            owner:
+              type: string
+            is_burned:
+              type: boolean
+            flags:
+              type: integer
+            transfer_fee:
+              type: integer
+            issuer:
+              type: string
+            nft_taxon:
+              type: integer
+            nft_serial:
+              type: integer
+            uri:
+              type: string
+              description: Hex-encoded metadata URI
+        message:
+          type: string
+
+    AccountNFTsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            account:
+              type: string
+            nfts:
+              type: array
+              items:
+                type: object
+                properties:
+                  Flags:
+                    type: integer
+                  Issuer:
+                    type: string
+                  NFTokenID:
+                    type: string
+                  NFTokenTaxon:
+                    type: integer
+                  TransferFee:
+                    type: integer
+                  URI:
+                    type: string
+                  nft_serial:
+                    type: integer
+            count:
+              type: integer
+        message:
+          type: string
+
+    WalletInfoResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            network:
+              type: object
+              properties:
+                network:
+                  type: string
+                  example: "testnet"
+                  description: "XRPL network (testnet or mainnet)"
+                serverUrl:
+                  type: string
+                  example: "wss://s.altnet.rippletest.net:51233"
+                  description: "XRPL server WebSocket URL"
+                walletAddress:
+                  type: string
+                  example: "rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b"
+                  description: "XRPL wallet address"
+            balance:
+              type: object
+              properties:
+                drops:
+                  type: string
+                  example: "30000000"
+                  description: "Balance in drops (1 XRP = 1,000,000 drops)"
+                xrp:
+                  type: string
+                  example: "30.000000"
+                  description: "Balance in XRP (human readable)"
+            connected:
+              type: boolean
+              example: true
+              description: "Whether the wallet is connected"
+            clientConnected:
+              type: boolean
+              example: true
+              description: "Whether the XRPL client is connected"
+        message:
+          type: string
+          example: "Real XRPL wallet connected"
+          description: "Status message"
+
+    NFTStatsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            totalNFTs:
+              type: number
+              example: 10
+              description: Total number of NFTs in the database
+            totalAccounts:
+              type: number
+              example: 5
+              description: Total number of unique accounts
+            recentMints:
+              type: number
+              example: 3
+              description: Number of NFTs minted in the last 24 hours
+            totalTransactions:
+              type: number
+              example: 25
+              description: Total number of recorded transactions
+        message:
+          type: string
+          example: "NFT statistics retrieved successfully"
+          description: Status message
+
+    NFTMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              trait_type:
+                type: string
+              value:
+                oneOf:
+                  - type: string
+                  - type: number
+        external_url:
+          type: string
+        animation_url:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Validation failed"
+        message:
+          type: string
+          example: "Invalid request data"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    RateLimitErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Too many requests"
+        message:
+          type: string
+          example: "Rate limit exceeded. Please try again later."
+        retryAfter:
+          type: string
+          example: "15 minutes"
+
+    NotImplementedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Feature not implemented yet"
+        timestamp:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated requests (coming soon)
+
+security: []
