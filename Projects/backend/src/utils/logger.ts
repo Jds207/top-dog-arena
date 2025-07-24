@@ -53,6 +53,31 @@ const transports = [
       winston.format.json()
     ),
   }),
+  // File transport for API calls
+  new winston.transports.File({
+    filename: 'logs/api.log',
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+    ),
+  }),
+  // File transport for funding operations
+  new winston.transports.File({
+    filename: 'logs/funding.log',
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+    ),
+  }),
+  // File transport for debug info
+  new winston.transports.File({
+    filename: 'logs/debug.log',
+    level: 'debug',
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+    ),
+  }),
 ];
 
 // Create the logger

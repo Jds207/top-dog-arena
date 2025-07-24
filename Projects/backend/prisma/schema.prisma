@@ -72,6 +72,14 @@ model NFT {
   isBurned       Boolean  @default(false)
   isTransferable Boolean  @default(true)
   
+  // Songbird wrapping fields
+  isWrapped            Boolean  @default(false)
+  songbirdTokenId      String?  // Token ID on Songbird network
+  wrapTransactionHash  String?  // Transaction hash when wrapped
+  unwrapTransactionHash String? // Transaction hash when unwrapped
+  wrappedAt            DateTime? // When the NFT was wrapped
+  unwrappedAt          DateTime? // When the NFT was unwrapped
+  
   // Top Dog Arena specific fields
   category       String?  // baseball_card, collectible, etc.
   rarity         String?  // common, uncommon, rare, legendary

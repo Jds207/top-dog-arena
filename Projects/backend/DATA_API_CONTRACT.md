@@ -199,6 +199,61 @@ GET /api/health/detailed
 }
 ```
 
+### 5. Wallet Management Endpoints
+
+#### Fund Wallet from Testnet Faucet
+```http
+POST /api/wallet/fund
+```
+
+**Request Schema:**
+```json
+{
+  "address": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+}
+```
+
+**Response Schema:**
+```json
+{
+  "success": true,
+  "data": {
+    "balanceDrops": "10000000",
+    "balanceXRP": "10.000000",
+    "requestedAddress": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
+    "actualAddress": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
+    "seed": "sEdTM1uX8pu2do5XvTnutH6HsouMaM2",
+    "network": "testnet",
+    "note": "Funding successful - 10 XRP added to wallet"
+  },
+  "message": "Wallet funded successfully",
+  "timestamp": "2025-07-23T03:04:33.102Z"
+}
+```
+
+#### Get Wallet Credentials
+```http
+GET /api/wallet/credentials/{address}
+```
+
+**Parameters:**
+- `address` (string, required): XRPL wallet address
+
+**Response Schema:**
+```json
+{
+  "success": true,
+  "data": {
+    "address": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
+    "seed": "sEdTM1uX8pu2do5XvTnutH6HsouMaM2",
+    "balanceDrops": "10000000",
+    "balanceXRP": "10.000000"
+  },
+  "message": "Wallet credentials retrieved successfully",
+  "timestamp": "2025-07-23T03:04:33.102Z"
+}
+```
+
 ## 🎨 NFT Creation Endpoint
 
 #### Create NFT with Database Storage

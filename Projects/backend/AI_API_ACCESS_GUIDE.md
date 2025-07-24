@@ -49,6 +49,10 @@ curl -X GET "http://localhost:3004/api/health"
 - `GET /api/health/detailed` - Detailed system status
 - `GET /api/health/xrpl` - XRPL connection status
 
+#### Wallet Endpoints
+- `POST /api/wallet/fund` - Fund wallet from testnet faucet
+- `GET /api/wallet/credentials/{address}` - Get wallet credentials
+
 #### NFT Endpoints (Currently in "not configured" state)
 - `POST /api/nft/create` - Create single NFT
 - `POST /api/nft/batch-create` - Create multiple NFTs
@@ -76,6 +80,20 @@ curl -X POST "http://localhost:3004/api/nft/create" \
 #### Get Account NFTs (GET)
 ```bash
 curl -X GET "http://localhost:3004/api/nft/account/rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+```
+
+#### Fund Wallet (POST)
+```bash
+curl -X POST "http://localhost:3004/api/wallet/fund" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+  }'
+```
+
+#### Get Wallet Credentials (GET)
+```bash
+curl -X GET "http://localhost:3004/api/wallet/credentials/rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
 ```
 
 ### 5. Response Format

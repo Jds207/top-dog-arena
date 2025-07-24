@@ -34,6 +34,10 @@ export class DatabaseService {
     address: string;
     network?: string;
     publicKey?: string;
+    privateKey?: string;
+    seed?: string;
+    balance?: string;
+    balanceXRP?: string;
     isOwned?: boolean;
     nickname?: string;
     description?: string;
@@ -44,6 +48,10 @@ export class DatabaseService {
           address: data.address,
           network: data.network || 'testnet',
           publicKey: data.publicKey,
+          privateKey: data.privateKey,
+          seed: data.seed,
+          balance: data.balance,
+          balanceXRP: data.balanceXRP,
           isOwned: data.isOwned || false,
           nickname: data.nickname,
           description: data.description,
@@ -93,6 +101,119 @@ export class DatabaseService {
       logger.debug(`💰 Updated balance for ${address}: ${balanceXRP} XRP`);
     } catch (error) {
       logger.error(`❌ Failed to update balance for ${address}:`, error);
+      throw error;
+    }
+  }
+
+  // Alias for createAccount to match server usage
+  async saveAccount(data: {
+    address: string;
+    network?: string;
+    publicKey?: string;
+    privateKey?: string;
+    seed?: string;
+    balance?: string;
+    balanceXRP?: string;
+    isOwned?: boolean;
+    nickname?: string;
+    description?: string;
+    metadata?: any;
+  }) {
+    const accountData = {
+      address: data.address,
+      network: data.network || 'testnet',
+      publicKey: data.publicKey,
+      privateKey: data.privateKey,
+      seed: data.seed,
+      balance: data.balance,
+      balanceXRP: data.balanceXRP,
+      isOwned: data.isOwned || false,
+      nickname: data.nickname,
+      description: data.description,
+    };
+
+    // If metadata is provided, try to extract useful fields
+    if (data.metadata) {
+      if (data.metadata.publicKey && !accountData.publicKey) {
+        accountData.publicKey = data.metadata.publicKey;
+      }
+      if (data.metadata.privateKey && !accountData.privateKey) {
+        accountData.privateKey = data.metadata.privateKey;
+      }
+      if (data.metadata.seed && !accountData.seed) {
+        accountData.seed = data.metadata.seed;
+      }
+      if (data.metadata.balanceDrops && !accountData.balance) {
+        accountData.balance = data.metadata.balanceDrops;
+      }
+      if (data.metadata.balanceXRP && !accountData.balanceXRP) {
+        accountData.balanceXRP = data.metadata.balanceXRP;
+      }
+      // Store metadata as JSON in tags field for now
+      if (Object.keys(data.metadata).length > 0) {
+        accountData.description = accountData.description || JSON.stringify(data.metadata);
+      }
+    }
+
+    return this.createAccount(accountData);
+  }
+
+  async updateAccount(address: string, updates: {
+    address?: string;
+    balance?: string;
+    balanceXRP?: string;
+    seed?: string;
+    nickname?: string;
+    description?: string;
+    tags?: string;
+    metadata?: any;
+  }) {
+    try {
+      const updateData: any = {};
+      
+      if (updates.address !== undefined) updateData.address = updates.address;
+      if (updates.balance !== undefined) updateData.balance = updates.balance;
+      if (updates.balanceXRP !== undefined) updateData.balanceXRP = updates.balanceXRP;
+      if (updates.seed !== undefined) updateData.seed = updates.seed;
+      if (updates.nickname !== undefined) updateData.nickname = updates.nickname;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.tags !== undefined) updateData.tags = updates.tags;
+      
+      // Handle metadata by storing in tags field as JSON
+      if (updates.metadata) {
+        updateData.tags = JSON.stringify(updates.metadata);
+      }
+
+      const account = await this.prisma.account.update({
+        where: { address },
+        data: {
+          ...updateData,
+          updatedAt: new Date(),
+        },
+      });
+      
+      logger.info(`📝 Updated account: ${updates.address || address}`);
+      return account;
+    } catch (error) {
+      logger.error(`❌ Failed to update account ${address}:`, error);
+      throw error;
+    }
+  }
+
+  async getAllAccounts(limit?: number) {
+    try {
+      return await this.prisma.account.findMany({
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: limit,
+        include: {
+          nftsOwned: true,
+          nftsIssued: true,
+        },
+      });
+    } catch (error) {
+      logger.error('❌ Failed to get all accounts:', error);
       throw error;
     }
   }
@@ -239,6 +360,30 @@ export class DatabaseService {
       logger.info(`🔄 Updated NFT ${nftTokenID} owner to ${newOwnerAddress}`);
     } catch (error) {
       logger.error(`❌ Failed to update NFT owner:`, error);
+      throw error;
+    }
+  }
+
+  async updateNFTStatus(nftTokenID: string, updates: {
+    isWrapped?: boolean;
+    songbirdTokenId?: string;
+    wrapTransactionHash?: string;
+    unwrapTransactionHash?: string;
+    wrappedAt?: Date;
+    unwrappedAt?: Date;
+  }): Promise<void> {
+    try {
+      await this.prisma.nFT.update({
+        where: { nftTokenID },
+        data: {
+          ...updates,
+          lastSyncAt: new Date(),
+        },
+      });
+
+      logger.info(`🔄 Updated NFT ${nftTokenID} wrap status`);
+    } catch (error) {
+      logger.error(`❌ Failed to update NFT status:`, error);
       throw error;
     }
   }

@@ -7,6 +7,7 @@ info:
     ## Features
     - Create single and batch NFTs on XRPL
     - Query NFT details and ownership
+    - XRPL wallet management with testnet faucet integration
     - Health monitoring endpoints
     - Rate limiting and validation
     
@@ -18,8 +19,12 @@ info:
     
     ## XRPL Integration
     This API integrates with the XRP Ledger to mint NFTs representing baseball cards and other collectibles.
+    The wallet funding feature uses the XRPL testnet faucet, which creates new wallets instead of funding existing addresses.
     
-  version: 1.0.0
+    ## Last Updated
+    July 23, 2025 - Updated wallet funding endpoint with enhanced response structure
+    
+  version: 1.1.0
   contact:
     name: Top Dog Arena
     url: https://topdogarena.com
@@ -39,8 +44,12 @@ servers:
 tags:
   - name: Health
     description: API health check endpoints
+  - name: Wallet
+    description: XRPL wallet creation and management
   - name: NFT
     description: NFT creation and management operations
+  - name: Songbird
+    description: Cross-chain NFT wrapping between XRPL and Songbird network
   - name: Auth
     description: Authentication endpoints (coming soon)
 
@@ -107,6 +116,69 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /wallet/credentials/{address}:
+    get:
+      tags:
+        - Wallet
+      summary: Get wallet credentials
+      description: |
+        Retrieve stored private credentials for a wallet address.
+        Returns the seed and balance information if the wallet is owned by this system.
+      operationId: getWalletCredentials
+      parameters:
+        - name: address
+          in: path
+          required: true
+          description: XRPL wallet address
+          schema:
+            type: string
+            example: "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+      responses:
+        '200':
+          description: Wallet credentials retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                        example: "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+                        description: "XRPL wallet address"
+                      seed:
+                        type: string
+                        example: "sEdTM1uX8pu2do5XvTnutH6HsouMaM2"
+                        description: "Private key seed for the wallet"
+                      balanceDrops:
+                        type: string
+                        example: "10000000"
+                        description: "Current balance in drops"
+                      balanceXRP:
+                        type: string
+                        example: "10.000000"
+                        description: "Current balance in XRP format"
+                  message:
+                    type: string
+                    example: "Wallet credentials retrieved successfully"
+        '404':
+          description: Wallet not found or not owned by this system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error retrieving credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /nft/create:
     post:
       tags:
@@ -126,7 +198,7 @@ paths:
             example:
               name: "Mike Trout - Angels Superstar"
               description: "A legendary baseball card featuring Mike Trout in his Angels uniform."
-              image: "https://topdogarena.com/images/cards/mike-trout-001.png"
+              imageUrl: "https://topdogarena.com/images/cards/mike-trout-001.png"
               attributes:
                 - trait_type: "Player"
                   value: "Mike Trout"
@@ -321,6 +393,472 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /wallet/create:
+    post:
+      tags:
+        - Wallet
+      summary: Create new XRPL wallet
+      description: Generate a new XRPL wallet with address, seed, and keys
+      operationId: createWallet
+      responses:
+        '201':
+          description: Wallet created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                        example: "rsDfKpwz1fm5C2g3ehHutvS55EfqjXwmkD"
+                      seed:
+                        type: string
+                        example: "sEdVRjMcsuXZDaeWfPUXT8xTsQRgbf4"
+                      publicKey:
+                        type: string
+                      network:
+                        type: string
+                        example: "testnet"
+                      databaseId:
+                        type: string
+                  message:
+                    type: string
+                  warning:
+                    type: string
+                  timestamp:
+                    type: string
+        '500':
+          description: Wallet creation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/validate:
+    post:
+      tags:
+        - Wallet
+      summary: Validate XRPL address format
+      description: Check if an XRPL address has valid format
+      operationId: validateWalletAddress
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+              properties:
+                address:
+                  type: string
+                  example: "rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b"
+      responses:
+        '200':
+          description: Address validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                      isValid:
+                        type: boolean
+                      network:
+                        type: string
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+        '400':
+          description: Address is required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/fund:
+    post:
+      tags:
+        - Wallet
+      summary: Fund wallet from testnet faucet
+      description: |
+        Fund a wallet using XRPL testnet faucet (testnet only).
+        
+        **Important:** The XRPL testnet faucet creates a new wallet instead of funding the requested address.
+        Use the `actualAddress` and `seed` from the response to access the funded wallet.
+      operationId: fundWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+              properties:
+                address:
+                  type: string
+                  example: "rsDfKpwz1fm5C2g3ehHutvS55EfqjXwmkD"
+                  description: "The wallet address you want to fund (note: faucet will create a different wallet)"
+      responses:
+        '200':
+          description: Wallet funded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      balanceDrops:
+                        type: string
+                        example: "10000000"
+                        description: "Balance in drops (1 XRP = 1,000,000 drops)"
+                      balanceXRP:
+                        type: string
+                        example: "10.000000"
+                        description: "Balance in human-readable XRP format"
+                      requestedAddress:
+                        type: string
+                        example: "rsDfKpwz1fm5C2g3ehHutvS55EfqjXwmkD"
+                        description: "The wallet address you originally requested funding for"
+                      actualAddress:
+                        type: string
+                        example: "rDWxewf8S2ze6dHVVuLxrh95MfuFFUeQe1"
+                        description: "The wallet address that was actually funded by the faucet"
+                      seed:
+                        type: string
+                        example: "sEdVQQU2oN1tidWKJeKLQVVJ9FwVh4o"
+                        description: "Private key seed for the funded wallet (keep secure!)"
+                      network:
+                        type: string
+                        example: "testnet"
+                        description: "Network where the wallet was funded"
+                      note:
+                        type: string
+                        example: "Funding successful - 10 XRP added to wallet"
+                        description: "Status message about the funding operation"
+                  message:
+                    type: string
+                    example: "Wallet funded successfully"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-07-23T03:04:33.102Z"
+        '400':
+          description: Invalid address, not testnet, or funding failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error during funding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/sync-balance:
+    post:
+      tags:
+        - Wallet
+      summary: Sync wallet balance from XRPL
+      description: Fetch and update wallet balance from XRPL network
+      operationId: syncWalletBalance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+              properties:
+                address:
+                  type: string
+                  example: "rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b"
+      responses:
+        '200':
+          description: Balance synced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                      balance:
+                        type: object
+                        properties:
+                          drops:
+                            type: string
+                          xrp:
+                            type: string
+                      synced:
+                        type: boolean
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+        '404':
+          description: Account not found (unfunded)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                      balance:
+                        type: object
+                        nullable: true
+                      synced:
+                        type: boolean
+                  error:
+                    type: string
+                  message:
+                    type: string
+
+  /wallet/sync-all:
+    post:
+      tags:
+        - Wallet
+      summary: Sync all wallet balances
+      description: Sync balances for all wallets in the database
+      operationId: syncAllWalletBalances
+      responses:
+        '200':
+          description: Batch sync completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      totalAccounts:
+                        type: integer
+                      successCount:
+                        type: integer
+                      errorCount:
+                        type: integer
+                      results:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            success:
+                              type: boolean
+                            balance:
+                              type: string
+                              nullable: true
+                            error:
+                              type: string
+                              nullable: true
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+
+  /wallet/list:
+    get:
+      tags:
+        - Wallet
+      summary: Get all wallets
+      description: Retrieve all wallet information from the database
+      operationId: getAllWallets
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of wallets to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+        - name: includeSecrets
+          in: query
+          description: Include sensitive data for owned wallets (publicKey, hasSeed, hasPrivateKey)
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Wallets retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      wallets:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/WalletInfo'
+                      count:
+                        type: integer
+                      total:
+                        type: integer
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/{address}:
+    get:
+      tags:
+        - Wallet
+      summary: Get wallet by address
+      description: Retrieve specific wallet information by XRPL address
+      operationId: getWalletByAddress
+      parameters:
+        - name: address
+          in: path
+          required: true
+          description: XRPL wallet address
+          schema:
+            type: string
+            pattern: '^r[1-9A-HJ-NP-Za-km-z]{25,34}$'
+            example: "rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b"
+        - name: includeSecrets
+          in: query
+          description: Include sensitive data for owned wallets (publicKey, hasSeed, hasPrivateKey)
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Wallet information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/WalletInfo'
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+        '400':
+          description: Invalid address format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/stats:
+    get:
+      tags:
+        - Wallet
+      summary: Get wallet statistics
+      description: Retrieve comprehensive statistics about all wallets in the database
+      operationId: getWalletStats
+      responses:
+        '200':
+          description: Wallet statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      totalWallets:
+                        type: integer
+                        description: Total number of wallets
+                      ownedWallets:
+                        type: integer
+                        description: Number of wallets owned by the service
+                      externalWallets:
+                        type: integer
+                        description: Number of external/imported wallets
+                      activeWallets:
+                        type: integer
+                        description: Number of active wallets
+                      fundedWallets:
+                        type: integer
+                        description: Number of wallets with non-zero balance
+                      unfundedWallets:
+                        type: integer
+                        description: Number of wallets with zero or no balance
+                      networkDistribution:
+                        type: object
+                        properties:
+                          testnet:
+                            type: integer
+                          mainnet:
+                            type: integer
+                          devnet:
+                            type: integer
+                      recentlyCreated:
+                        type: integer
+                        description: Number of wallets created in the last 24 hours
+                      recentlySynced:
+                        type: integer
+                        description: Number of wallets synced in the last hour
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /auth/register:
     post:
       tags:
@@ -375,6 +913,338 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotImplementedResponse'
+
+  /songbird/status:
+    get:
+      tags:
+        - Songbird
+      summary: Get Songbird network connection status
+      description: Check the status of the Songbird network connection and service availability
+      operationId: getSongbirdStatus
+      responses:
+        '200':
+          description: Songbird connection status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      connected:
+                        type: boolean
+                        example: true
+                      network:
+                        type: string
+                        example: "songbird"
+                      walletAddress:
+                        type: string
+                        example: "0x742d35Cc6648C4532B3DCf4FA0EFC9bc57F8e16F"
+                      contractAddress:
+                        type: string
+                        example: "0x1234567890123456789012345678901234567890"
+                      balance:
+                        type: string
+                        example: "1.5 SGB"
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /songbird/wrap:
+    post:
+      tags:
+        - Songbird
+      summary: Wrap XRPL NFT to Songbird
+      description: Wrap an XRPL NFT as an ERC721 token on the Songbird network
+      operationId: wrapXRPLNFT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - xrplNftId
+                - xrplOwnerAddress
+                - songbirdRecipientAddress
+                - metadata
+              properties:
+                xrplNftId:
+                  type: string
+                  description: The XRPL NFT ID to wrap
+                  example: "000B013A95F14B0044F78A264E41713C64B5F89242540EE208C3098E00000D65"
+                xrplOwnerAddress:
+                  type: string
+                  description: The XRPL address that owns the NFT
+                  example: "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+                songbirdRecipientAddress:
+                  type: string
+                  description: The Songbird address that will receive the wrapped NFT
+                  example: "0x742d35Cc6648C4532B3DCf4FA0EFC9bc57F8e16F"
+                metadata:
+                  type: object
+                  description: NFT metadata
+                  properties:
+                    name:
+                      type: string
+                      example: "Baseball Card #123"
+                    description:
+                      type: string
+                      example: "Rare rookie card"
+                    image:
+                      type: string
+                      example: "https://example.com/image.jpg"
+                    attributes:
+                      type: array
+                      items:
+                        type: object
+      responses:
+        '200':
+          description: NFT wrapped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      songbirdTokenId:
+                        type: string
+                        example: "1"
+                      transactionHash:
+                        type: string
+                        example: "0xabcdef..."
+                      gasUsed:
+                        type: string
+                        example: "150000"
+                  message:
+                    type: string
+                    example: "NFT successfully wrapped to Songbird"
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /songbird/unwrap:
+    post:
+      tags:
+        - Songbird
+      summary: Unwrap Songbird NFT back to XRPL
+      description: Unwrap a Songbird ERC721 token back to the original XRPL NFT
+      operationId: unwrapSongbirdNFT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - songbirdTokenId
+              properties:
+                songbirdTokenId:
+                  type: string
+                  description: The Songbird token ID to unwrap
+                  example: "1"
+      responses:
+        '200':
+          description: NFT unwrapped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      xrplNftId:
+                        type: string
+                        example: "000B013A95F14B0044F78A264E41713C64B5F89242540EE208C3098E00000D65"
+                      transactionHash:
+                        type: string
+                        example: "0xabcdef..."
+                      gasUsed:
+                        type: string
+                        example: "100000"
+                      owner:
+                        type: string
+                        example: "0x742d35Cc6648C4532B3DCf4FA0EFC9bc57F8e16F"
+                  message:
+                    type: string
+                    example: "NFT successfully unwrapped from Songbird"
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /songbird/nft/{tokenId}:
+    get:
+      tags:
+        - Songbird
+      summary: Get wrapped NFT information
+      description: Retrieve detailed information about a wrapped NFT on Songbird
+      operationId: getWrappedNFTInfo
+      parameters:
+        - name: tokenId
+          in: path
+          required: true
+          description: The Songbird token ID
+          schema:
+            type: string
+            example: "1"
+      responses:
+        '200':
+          description: Wrapped NFT information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      xrplNftId:
+                        type: string
+                        example: "000B013A95F14B0044F78A264E41713C64B5F89242540EE208C3098E00000D65"
+                      isWrapped:
+                        type: boolean
+                        example: true
+                      owner:
+                        type: string
+                        example: "0x742d35Cc6648C4532B3DCf4FA0EFC9bc57F8e16F"
+                      tokenURI:
+                        type: string
+                        example: "https://api.topdogarena.com/metadata/abc123"
+                      metadata:
+                        type: object
+                        description: NFT metadata object
+                  message:
+                    type: string
+                    example: "Wrapped NFT info retrieved successfully"
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /songbird/gas/{operation}:
+    get:
+      tags:
+        - Songbird
+      summary: Get gas estimates for operations
+      description: Get gas cost estimates for wrapping or unwrapping operations
+      operationId: getSongbirdGasEstimate
+      parameters:
+        - name: operation
+          in: path
+          required: true
+          description: The operation to estimate gas for
+          schema:
+            type: string
+            enum: [wrap, unwrap]
+            example: "wrap"
+      responses:
+        '200':
+          description: Gas estimate retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      operation:
+                        type: string
+                        example: "wrap"
+                      gasLimit:
+                        type: string
+                        example: "150000"
+                      gasPrice:
+                        type: string
+                        example: "25000000000"
+                      estimatedCost:
+                        type: string
+                        example: "0.00375 SGB"
+                  message:
+                    type: string
+                    example: "Gas estimate for wrap operation"
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /songbird/wallet/{address}/nfts:
+    get:
+      tags:
+        - Songbird
+      summary: Get wallet's wrapped NFTs
+      description: Retrieve all wrapped NFTs owned by a specific wallet on Songbird
+      operationId: getWalletWrappedNFTs
+      parameters:
+        - name: address
+          in: path
+          required: true
+          description: The wallet address to query
+          schema:
+            type: string
+            example: "0x742d35Cc6648C4532B3DCf4FA0EFC9bc57F8e16F"
+      responses:
+        '200':
+          description: Wallet NFTs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      wallet:
+                        type: string
+                        example: "0x742d35Cc6648C4532B3DCf4FA0EFC9bc57F8e16F"
+                      nfts:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            tokenId:
+                              type: string
+                              example: "1"
+                            xrplNftId:
+                              type: string
+                              example: "000B013A95F14B0044F78A264E41713C64B5F89242540EE208C3098E00000D65"
+                            isWrapped:
+                              type: boolean
+                              example: true
+                            tokenURI:
+                              type: string
+                              example: "https://api.topdogarena.com/metadata/abc123"
+                            metadata:
+                              type: object
+                      count:
+                        type: integer
+                        example: 3
+                  message:
+                    type: string
+                    example: "Songbird NFTs retrieved successfully"
+                  timestamp:
+                    type: string
+                    format: date-time
 
 components:
   schemas:
@@ -462,7 +1332,7 @@ components:
       required:
         - name
         - description
-        - image
+        - imageUrl
       properties:
         name:
           type: string
@@ -474,7 +1344,7 @@ components:
           minLength: 1
           maxLength: 1000
           example: "A legendary baseball card featuring Mike Trout"
-        image:
+        imageUrl:
           type: string
           format: uri
           example: "https://topdogarena.com/images/cards/mike-trout-001.png"
@@ -708,6 +1578,100 @@ components:
           type: string
           example: "Real XRPL wallet connected"
           description: "Status message"
+
+    WalletInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "cld3fgh8900001234567890"
+          description: Database ID of the wallet
+        address:
+          type: string
+          example: "rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b"
+          description: XRPL wallet address
+        network:
+          type: string
+          example: "testnet"
+          enum: [testnet, mainnet, devnet]
+          description: XRPL network
+        balance:
+          type: string
+          nullable: true
+          example: "25000000"
+          description: Balance in drops (1 XRP = 1,000,000 drops)
+        balanceXRP:
+          type: string
+          nullable: true
+          example: "25.000000"
+          description: Balance in XRP (human readable)
+        isOwned:
+          type: boolean
+          example: true
+          description: Whether this wallet is owned by the service
+        isActive:
+          type: boolean
+          example: true
+          description: Whether the wallet is active
+        nickname:
+          type: string
+          nullable: true
+          example: "Main Trading Wallet"
+          description: Optional nickname for the wallet
+        description:
+          type: string
+          nullable: true
+          example: "Primary wallet for NFT trading operations"
+          description: Optional description
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: string
+          example: ["trading", "main", "production"]
+          description: Array of tags for categorization
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-07-22T10:30:00.000Z"
+          description: When the wallet was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-07-22T15:45:30.000Z"
+          description: When the wallet was last updated
+        lastSyncAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-07-22T15:45:30.000Z"
+          description: When the wallet balance was last synced
+        nftCount:
+          type: object
+          properties:
+            owned:
+              type: integer
+              example: 12
+              description: Number of NFTs owned by this wallet
+            issued:
+              type: integer
+              example: 5
+              description: Number of NFTs issued by this wallet
+        publicKey:
+          type: string
+          nullable: true
+          example: "ED123456..."
+          description: Public key (only included if includeSecrets=true and wallet is owned)
+        hasSeed:
+          type: boolean
+          nullable: true
+          example: true
+          description: Whether wallet seed is stored (only included if includeSecrets=true and wallet is owned)
+        hasPrivateKey:
+          type: boolean
+          nullable: true
+          example: true
+          description: Whether private key is stored (only included if includeSecrets=true and wallet is owned)
 
     NFTStatsResponse:
       type: object

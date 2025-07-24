@@ -19,6 +19,73 @@ Currently, all endpoints are public with rate limiting. Authentication will be a
 - **Batch Operations**: 3 requests per hour per IP
 - **Read Operations**: 200 requests per 15 minutes per IP
 
+## Wallet Endpoints
+
+### 1. Fund Wallet
+
+**POST** `/wallet/fund`
+
+Funds a wallet with XRP from the testnet faucet. Creates the wallet if it doesn't exist.
+
+#### Request Body
+
+```json
+{
+  "address": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+}
+```
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `address` | string | Yes | XRPL address to fund |
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "balanceDrops": "10000000",
+    "balanceXRP": "10.000000",
+    "requestedAddress": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
+    "actualAddress": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
+    "seed": "sEdTM1uX8pu2do5XvTnutH6HsouMaM2",
+    "network": "testnet",
+    "note": "Funding successful - 10 XRP added to wallet"
+  },
+  "message": "Wallet funded successfully"
+}
+```
+
+### 2. Get Wallet Credentials
+
+**GET** `/wallet/credentials/:address`
+
+Retrieves stored private credentials for a wallet address.
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `address` | string | Yes | XRPL address to get credentials for |
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "address": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
+    "seed": "sEdTM1uX8pu2do5XvTnutH6HsouMaM2",
+    "balanceDrops": "10000000",
+    "balanceXRP": "10.000000"
+  },
+  "message": "Wallet credentials retrieved successfully"
+}
+```
+
 ## NFT Endpoints
 
 ### 1. Create Single NFT
@@ -241,6 +308,8 @@ Retrieves wallet and network information.
       "walletAddress": "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
     },
     "balance": {
+      "balanceDrops": "999988000000",
+      "balanceXRP": "999.988000",
       "balance": "999988000000",
       "available": "999968000000"
     }

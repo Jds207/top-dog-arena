@@ -14,6 +14,7 @@ const xrpl_1 = require("xrpl");
 const multer_1 = __importDefault(require("multer"));
 const fs_1 = __importDefault(require("fs"));
 const database_service_1 = require("./services/database.service");
+const songbird_service_1 = require("./services/songbird.service");
 // Load environment variables
 dotenv_1.default.config();
 // Create simple logger
@@ -174,6 +175,80 @@ class RealXRPLService {
             client: this.client?.isConnected() || false
         };
     }
+    async createWallet() {
+        try {
+            // Generate a new wallet
+            const newWallet = xrpl_1.Wallet.generate();
+            logger.info(`🏦 Generated new XRPL wallet: ${newWallet.address}`);
+            return {
+                address: newWallet.address,
+                seed: newWallet.seed || '',
+                publicKey: newWallet.publicKey,
+                privateKey: newWallet.privateKey,
+            };
+        }
+        catch (error) {
+            logger.error('❌ Error creating new wallet:', error);
+            throw new Error(`Failed to create wallet: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    async fundWallet(address) {
+        try {
+            if (!this.client) {
+                throw new Error('XRPL client not connected');
+            }
+            // Fund the wallet using XRPL library's fundWallet method
+            const fundResult = await this.client.fundWallet();
+            if (fundResult?.wallet?.address) {
+                logger.info(`💰 Funded wallet ${fundResult.wallet.address} with ${fundResult.balance} XRP`);
+                return {
+                    success: true,
+                    balance: fundResult.balance?.toString()
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    error: 'Failed to fund wallet from faucet'
+                };
+            }
+        }
+        catch (error) {
+            logger.error('❌ Error funding wallet:', error);
+            return {
+                success: false,
+                error: `Failed to fund wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+            };
+        }
+    }
+    async getAccountBalance(address) {
+        if (!this.client)
+            return null;
+        try {
+            const response = await this.client.request({
+                command: 'account_info',
+                account: address,
+                ledger_index: 'validated'
+            });
+            const balance = response.result.account_data.Balance;
+            const balanceXRP = (parseInt(balance) / 1000000).toFixed(6);
+            return { balance, balanceXRP };
+        }
+        catch (error) {
+            logger.info(`Account ${address} not found or unfunded:`, error);
+            return null;
+        }
+    }
+    isValidXRPLAddress(address) {
+        try {
+            // XRPL addresses start with 'r' and are 25-34 characters long
+            const addressRegex = /^r[1-9A-HJ-NP-Za-km-z]{24,33}$/;
+            return addressRegex.test(address);
+        }
+        catch (error) {
+            return false;
+        }
+    }
     async disconnect() {
         if (this.client) {
             await this.client.disconnect();
@@ -250,7 +325,7 @@ app.get('/', (req, res) => {
 });
 // Health endpoints
 app.get('/api/health', (req, res) => {
-    res.status(200).json({
+    return res.status(200).json({
         success: true,
         message: 'Top Dog Arena API is running',
         timestamp: new Date().toISOString(),
@@ -260,7 +335,7 @@ app.get('/api/health', (req, res) => {
 app.get('/api/health/detailed', async (req, res) => {
     const walletInfo = xrplService.getWalletInfo();
     const dbHealth = await database_service_1.databaseService.healthCheck();
-    res.status(200).json({
+    return res.status(200).json({
         success: true,
         message: 'Top Dog Arena API health check',
         timestamp: new Date().toISOString(),
@@ -284,7 +359,7 @@ app.get('/api/health/detailed', async (req, res) => {
 });
 app.get('/api/health/xrpl', (req, res) => {
     const walletInfo = xrplService.getWalletInfo();
-    res.status(200).json({
+    return res.status(200).json({
         success: true,
         message: 'XRPL connection status',
         timestamp: new Date().toISOString(),
@@ -404,7 +479,7 @@ app.get('/api/nft/wallet/info', async (req, res) => {
     const xrpBalance = updatedWalletInfo.balance && updatedWalletInfo.balance !== 'error'
         ? (parseInt(updatedWalletInfo.balance) / 1000000).toFixed(6)
         : null;
-    res.status(200).json({
+    return res.status(200).json({
         success: true,
         data: {
             network: {
@@ -421,6 +496,449 @@ app.get('/api/nft/wallet/info', async (req, res) => {
         },
         message: updatedWalletInfo.connected ? 'Real XRPL wallet connected' : 'Wallet not configured'
     });
+});
+// Create new XRPL wallet endpoint
+app.post('/api/wallet/create', async (req, res) => {
+    try {
+        logger.info('📝 Creating new XRPL wallet...');
+        const newWallet = await xrplService.createWallet();
+        // Save the wallet to database
+        const account = await database_service_1.databaseService.saveAccount({
+            address: newWallet.address,
+            network: process.env.XRPL_NETWORK || 'testnet',
+            isOwned: true,
+            metadata: {
+                publicKey: newWallet.publicKey,
+                createdAt: new Date().toISOString(),
+                source: 'api_generated'
+            }
+        });
+        return res.status(201).json({
+            success: true,
+            data: {
+                address: newWallet.address,
+                seed: newWallet.seed,
+                publicKey: newWallet.publicKey,
+                network: process.env.XRPL_NETWORK || 'testnet',
+                databaseId: account.id
+            },
+            message: 'New XRPL wallet created successfully',
+            warning: 'Store the seed securely! It cannot be recovered if lost.',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error creating wallet:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to create wallet',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Validate XRPL address endpoint
+app.post('/api/wallet/validate', async (req, res) => {
+    try {
+        const { address } = req.body;
+        if (!address) {
+            return res.status(400).json({
+                success: false,
+                error: 'Wallet address is required',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // XRPL addresses start with 'r' and are 25-34 characters long
+        const addressRegex = /^r[1-9A-HJ-NP-Za-km-z]{24,33}$/;
+        const isValid = addressRegex.test(address);
+        return res.status(200).json({
+            success: true,
+            data: {
+                address,
+                isValid,
+                network: process.env.XRPL_NETWORK || 'testnet'
+            },
+            message: isValid ? 'Valid XRPL address' : 'Invalid XRPL address format',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error validating address:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to validate address',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Fund wallet from testnet faucet
+app.post('/api/wallet/fund', async (req, res) => {
+    try {
+        const { address } = req.body;
+        if (!address) {
+            return res.status(400).json({
+                success: false,
+                error: 'Wallet address is required',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Validate address format
+        if (!xrplService.isValidXRPLAddress(address)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid XRPL address format',
+                timestamp: new Date().toISOString()
+            });
+        }
+        if (process.env.XRPL_NETWORK !== 'testnet') {
+            return res.status(400).json({
+                success: false,
+                error: 'Wallet funding is only available on testnet',
+                timestamp: new Date().toISOString()
+            });
+        }
+        logger.info(`💰 Attempting to fund wallet: ${address}`);
+        const fundResult = await xrplService.fundWallet(address);
+        if (fundResult.success) {
+            const actualAddress = fundResult.fundedAddress || address;
+            // Update account in database if it exists
+            try {
+                await database_service_1.databaseService.updateAccount(actualAddress, {
+                    metadata: {
+                        funded: true,
+                        fundedAt: new Date().toISOString(),
+                        initialBalance: fundResult.balance
+                    }
+                });
+            }
+            catch (dbError) {
+                logger.warn('Could not update account in database:', dbError);
+            }
+            return res.status(200).json({
+                success: true,
+                data: {
+                    requestedAddress: address,
+                    actualAddress: actualAddress,
+                    balance: fundResult.balance,
+                    network: process.env.XRPL_NETWORK || 'testnet',
+                    seed: fundResult.fundedSeed,
+                    note: fundResult.fundedAddress ? 'Testnet faucet created a new wallet instead of funding the requested address' : undefined
+                },
+                message: 'Wallet funded successfully from testnet faucet',
+                timestamp: new Date().toISOString()
+            });
+        }
+        else {
+            return res.status(400).json({
+                success: false,
+                error: fundResult.error || 'Failed to fund wallet',
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+    catch (error) {
+        logger.error('❌ Error funding wallet:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to fund wallet',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Sync wallet balance from XRPL network
+app.post('/api/wallet/sync-balance', async (req, res) => {
+    try {
+        const { address } = req.body;
+        if (!address) {
+            return res.status(400).json({
+                success: false,
+                error: 'Wallet address is required',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Validate address format
+        if (!xrplService.isValidXRPLAddress(address)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid XRPL address format',
+                timestamp: new Date().toISOString()
+            });
+        }
+        logger.info(`🔄 Syncing balance for wallet: ${address}`);
+        const balanceInfo = await xrplService.getAccountBalance(address);
+        if (balanceInfo) {
+            // Update balance in database
+            try {
+                await database_service_1.databaseService.updateAccountBalance(address, balanceInfo.balance, balanceInfo.balanceXRP);
+                return res.status(200).json({
+                    success: true,
+                    data: {
+                        address,
+                        balance: {
+                            drops: balanceInfo.balance,
+                            xrp: balanceInfo.balanceXRP
+                        },
+                        synced: true
+                    },
+                    message: 'Balance synced successfully',
+                    timestamp: new Date().toISOString()
+                });
+            }
+            catch (dbError) {
+                logger.error('Failed to update balance in database:', dbError);
+                return res.status(500).json({
+                    success: false,
+                    error: 'Failed to save balance to database',
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+        else {
+            return res.status(404).json({
+                success: false,
+                data: {
+                    address,
+                    balance: null,
+                    synced: false
+                },
+                error: 'Account not found on XRPL network (unfunded)',
+                message: 'Account does not exist on XRPL - send XRP to activate it',
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+    catch (error) {
+        logger.error('❌ Error syncing balance:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to sync balance',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Batch sync all wallet balances
+app.post('/api/wallet/sync-all', async (req, res) => {
+    try {
+        logger.info('🔄 Syncing all wallet balances...');
+        // Get all accounts from database
+        const accounts = await database_service_1.databaseService.getAllAccounts();
+        const results = [];
+        let successCount = 0;
+        let errorCount = 0;
+        for (const account of accounts) {
+            try {
+                const balanceInfo = await xrplService.getAccountBalance(account.address);
+                if (balanceInfo) {
+                    await database_service_1.databaseService.updateAccountBalance(account.address, balanceInfo.balance, balanceInfo.balanceXRP);
+                    results.push({
+                        address: account.address,
+                        success: true,
+                        balance: balanceInfo.balanceXRP + ' XRP'
+                    });
+                    successCount++;
+                }
+                else {
+                    results.push({
+                        address: account.address,
+                        success: false,
+                        error: 'Account not found (unfunded)'
+                    });
+                    errorCount++;
+                }
+            }
+            catch (error) {
+                results.push({
+                    address: account.address,
+                    success: false,
+                    error: error instanceof Error ? error.message : 'Unknown error'
+                });
+                errorCount++;
+            }
+        }
+        return res.status(200).json({
+            success: true,
+            data: {
+                totalAccounts: accounts.length,
+                successCount,
+                errorCount,
+                results
+            },
+            message: `Synced ${successCount}/${accounts.length} wallet balances`,
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error syncing all balances:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to sync balances',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Get all wallets/accounts in database
+app.get('/api/wallet/list', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
+        const includeSecrets = req.query.includeSecrets === 'true';
+        logger.info(`🔍 Retrieving all wallets from database${limit ? ` (limit: ${limit})` : ''}`);
+        const accounts = await database_service_1.databaseService.getAllAccounts(limit);
+        // Filter out sensitive information unless explicitly requested
+        const wallets = accounts.map((account) => {
+            const wallet = {
+                id: account.id,
+                address: account.address,
+                network: account.network,
+                balance: account.balance,
+                balanceXRP: account.balanceXRP,
+                isOwned: account.isOwned,
+                isActive: account.isActive,
+                nickname: account.nickname,
+                description: account.description,
+                tags: account.tags ? JSON.parse(account.tags) : null,
+                createdAt: account.createdAt,
+                updatedAt: account.updatedAt,
+                lastSyncAt: account.lastSyncAt,
+                nftCount: {
+                    owned: account.nftsOwned?.length || 0,
+                    issued: account.nftsIssued?.length || 0
+                }
+            };
+            // Only include sensitive data if explicitly requested and wallet is owned by us
+            if (includeSecrets && account.isOwned) {
+                wallet.publicKey = account.publicKey;
+                wallet.hasSeed = !!account.seed;
+                wallet.hasPrivateKey = !!account.privateKey;
+            }
+            return wallet;
+        });
+        return res.status(200).json({
+            success: true,
+            data: {
+                wallets,
+                count: wallets.length,
+                total: wallets.length
+            },
+            message: `Retrieved ${wallets.length} wallets from database`,
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error retrieving wallets:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to retrieve wallets',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Get wallet statistics  
+app.get('/api/wallet/stats', async (req, res) => {
+    try {
+        logger.info('📊 Retrieving wallet statistics...');
+        const allAccounts = await database_service_1.databaseService.getAllAccounts();
+        const stats = {
+            totalWallets: allAccounts.length,
+            ownedWallets: allAccounts.filter((acc) => acc.isOwned).length,
+            externalWallets: allAccounts.filter((acc) => !acc.isOwned).length,
+            activeWallets: allAccounts.filter((acc) => acc.isActive).length,
+            fundedWallets: allAccounts.filter((acc) => acc.balance && acc.balance !== '0').length,
+            unfundedWallets: allAccounts.filter((acc) => !acc.balance || acc.balance === '0').length,
+            networkDistribution: {
+                testnet: allAccounts.filter((acc) => acc.network === 'testnet').length,
+                mainnet: allAccounts.filter((acc) => acc.network === 'mainnet').length,
+                devnet: allAccounts.filter((acc) => acc.network === 'devnet').length
+            },
+            recentlyCreated: allAccounts.filter((acc) => {
+                const oneDayAgo = new Date();
+                oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+                return acc.createdAt > oneDayAgo;
+            }).length,
+            recentlySynced: allAccounts.filter((acc) => {
+                if (!acc.lastSyncAt)
+                    return false;
+                const oneHourAgo = new Date();
+                oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+                return acc.lastSyncAt > oneHourAgo;
+            }).length
+        };
+        return res.status(200).json({
+            success: true,
+            data: stats,
+            message: 'Retrieved wallet statistics',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error retrieving wallet statistics:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to retrieve wallet statistics',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Get specific wallet by address
+app.get('/api/wallet/:address', async (req, res) => {
+    try {
+        const { address } = req.params;
+        const includeSecrets = req.query.includeSecrets === 'true';
+        if (!address) {
+            return res.status(400).json({
+                success: false,
+                error: 'Address is required',
+                timestamp: new Date().toISOString()
+            });
+        }
+        logger.info(`🔍 Retrieving wallet information for: ${address}`);
+        const account = await database_service_1.databaseService.getAccount(address);
+        if (!account) {
+            return res.status(404).json({
+                success: false,
+                error: 'Wallet not found',
+                message: `Wallet with address ${address} not found in database`,
+                timestamp: new Date().toISOString()
+            });
+        }
+        const wallet = {
+            id: account.id,
+            address: account.address,
+            network: account.network,
+            balance: account.balance,
+            balanceXRP: account.balanceXRP,
+            isOwned: account.isOwned,
+            isActive: account.isActive,
+            nickname: account.nickname,
+            description: account.description,
+            tags: account.tags ? JSON.parse(account.tags) : null,
+            createdAt: account.createdAt,
+            updatedAt: account.updatedAt,
+            lastSyncAt: account.lastSyncAt,
+            nftCount: {
+                owned: account.nftsOwned?.length || 0,
+                issued: account.nftsIssued?.length || 0
+            }
+        };
+        // Only include sensitive data if explicitly requested and wallet is owned by us
+        if (includeSecrets && account.isOwned) {
+            wallet.publicKey = account.publicKey;
+            wallet.hasSeed = !!account.seed;
+            wallet.hasPrivateKey = !!account.privateKey;
+        }
+        return res.status(200).json({
+            success: true,
+            data: wallet,
+            message: `Retrieved wallet information for ${address}`,
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error retrieving wallet:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to retrieve wallet',
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 app.get('/api/nft/:nftId', async (req, res) => {
     const { nftId } = req.params;
@@ -594,22 +1112,292 @@ app.get('/api/stats/nft', async (req, res) => {
 });
 // Auth endpoints (placeholders)
 app.post('/api/auth/register', (req, res) => {
-    res.status(501).json({
+    return res.status(501).json({
         success: false,
         message: 'User registration not implemented yet',
         timestamp: new Date().toISOString()
     });
 });
 app.post('/api/auth/login', (req, res) => {
-    res.status(501).json({
+    return res.status(501).json({
         success: false,
         message: 'User login not implemented yet',
         timestamp: new Date().toISOString()
     });
 });
+// ======================
+// SONGBIRD INTEGRATION ENDPOINTS
+// ======================
+// Get Songbird connection status
+app.get('/api/songbird/status', async (req, res) => {
+    try {
+        const status = await songbird_service_1.songbirdService.getConnectionStatus();
+        return res.status(200).json({
+            success: true,
+            data: status,
+            message: status.connected ? 'Songbird network connected' : 'Songbird network not connected',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error getting Songbird status:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to get Songbird status',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Wrap XRPL NFT to Songbird
+app.post('/api/songbird/wrap', async (req, res) => {
+    try {
+        const { xrplNftId, songbirdRecipientAddress, xrplOwnerAddress } = req.body;
+        if (!xrplNftId || !songbirdRecipientAddress) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required fields',
+                message: 'xrplNftId and songbirdRecipientAddress are required',
+                timestamp: new Date().toISOString()
+            });
+        }
+        logger.info(`🎁 Wrapping XRPL NFT: ${xrplNftId} for ${songbirdRecipientAddress}`);
+        // Get NFT metadata from database
+        const nft = await database_service_1.databaseService.getNFT(xrplNftId);
+        if (!nft) {
+            return res.status(404).json({
+                success: false,
+                error: 'NFT not found',
+                message: `NFT with ID ${xrplNftId} not found in database`,
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Verify ownership if xrplOwnerAddress provided
+        if (xrplOwnerAddress && nft.ownerAddress !== xrplOwnerAddress) {
+            return res.status(403).json({
+                success: false,
+                error: 'Not authorized',
+                message: 'You do not own this NFT',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Prepare metadata
+        const metadata = {
+            name: nft.name || 'XRPL NFT',
+            description: nft.description || 'Wrapped XRPL NFT',
+            image: nft.imageUrl || '',
+            attributes: nft.attributes ? JSON.parse(nft.attributes) : []
+        };
+        // Wrap the NFT
+        const result = await songbird_service_1.songbirdService.wrapXRPLNFT({
+            xrplNftId,
+            xrplOwnerAddress: nft.ownerAddress,
+            songbirdRecipientAddress,
+            metadata
+        });
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                error: result.error,
+                message: 'Failed to wrap NFT on Songbird',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Update database with wrapped status
+        try {
+            await database_service_1.databaseService.updateNFTStatus(xrplNftId, {
+                isWrapped: true,
+                songbirdTokenId: result.songbirdTokenId,
+                wrapTransactionHash: result.transactionHash,
+                wrappedAt: new Date()
+            });
+        }
+        catch (dbError) {
+            logger.warn('⚠️ Failed to update database with wrap status:', dbError);
+        }
+        return res.status(200).json({
+            success: true,
+            data: {
+                xrplNftId,
+                songbirdTokenId: result.songbirdTokenId,
+                transactionHash: result.transactionHash,
+                gasUsed: result.gasUsed,
+                songbirdRecipientAddress,
+                metadata
+            },
+            message: 'NFT successfully wrapped on Songbird',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error wrapping NFT:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to wrap NFT',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Unwrap Songbird NFT back to XRPL
+app.post('/api/songbird/unwrap', async (req, res) => {
+    try {
+        const { songbirdTokenId } = req.body;
+        if (!songbirdTokenId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing songbirdTokenId',
+                timestamp: new Date().toISOString()
+            });
+        }
+        logger.info(`📤 Unwrapping Songbird NFT: ${songbirdTokenId}`);
+        // Get wrapped NFT info first
+        const nftInfo = await songbird_service_1.songbirdService.getWrappedNFTInfo(songbirdTokenId);
+        if (!nftInfo.success || !nftInfo.info) {
+            return res.status(404).json({
+                success: false,
+                error: 'Wrapped NFT not found',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Unwrap the NFT
+        const result = await songbird_service_1.songbirdService.unwrapNFT(songbirdTokenId);
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                error: result.error,
+                message: 'Failed to unwrap NFT from Songbird',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Update database with unwrapped status
+        try {
+            await database_service_1.databaseService.updateNFTStatus(result.xrplNftId, {
+                isWrapped: false,
+                unwrapTransactionHash: result.transactionHash,
+                unwrappedAt: new Date()
+            });
+        }
+        catch (dbError) {
+            logger.warn('⚠️ Failed to update database with unwrap status:', dbError);
+        }
+        return res.status(200).json({
+            success: true,
+            data: {
+                songbirdTokenId,
+                xrplNftId: result.xrplNftId,
+                transactionHash: result.transactionHash,
+                gasUsed: result.gasUsed,
+                owner: nftInfo.info.owner
+            },
+            message: 'NFT successfully unwrapped from Songbird',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error unwrapping NFT:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to unwrap NFT',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Get wrapped NFT info
+app.get('/api/songbird/nft/:tokenId', async (req, res) => {
+    try {
+        const { tokenId } = req.params;
+        logger.info(`🔍 Getting wrapped NFT info: ${tokenId}`);
+        const result = await songbird_service_1.songbirdService.getWrappedNFTInfo(tokenId);
+        if (!result.success) {
+            return res.status(404).json({
+                success: false,
+                error: result.error,
+                timestamp: new Date().toISOString()
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            data: result.info,
+            message: 'Wrapped NFT info retrieved successfully',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error getting wrapped NFT info:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to get wrapped NFT info',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Get gas estimates for operations
+app.get('/api/songbird/gas/:operation', async (req, res) => {
+    try {
+        const { operation } = req.params;
+        if (!['wrap', 'unwrap'].includes(operation)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid operation',
+                message: 'Operation must be "wrap" or "unwrap"',
+                timestamp: new Date().toISOString()
+            });
+        }
+        const gasEstimate = await songbird_service_1.songbirdService.getGasEstimate(operation);
+        return res.status(200).json({
+            success: true,
+            data: {
+                operation,
+                ...gasEstimate
+            },
+            message: `Gas estimate for ${operation} operation`,
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error getting gas estimate:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to get gas estimate',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+// Get wallet NFTs on Songbird
+app.get('/api/songbird/wallet/:address/nfts', async (req, res) => {
+    try {
+        const { address } = req.params;
+        logger.info(`🔍 Getting Songbird NFTs for wallet: ${address}`);
+        const result = await songbird_service_1.songbirdService.getWalletNFTs(address);
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                error: result.error,
+                timestamp: new Date().toISOString()
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            data: {
+                wallet: address,
+                nfts: result.nfts,
+                count: result.nfts?.length || 0
+            },
+            message: 'Songbird NFTs retrieved successfully',
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        logger.error('❌ Error getting wallet NFTs:', error);
+        return res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to get wallet NFTs',
+            timestamp: new Date().toISOString()
+        });
+    }
+});
 // 404 handler
 app.use('*', (req, res) => {
-    res.status(404).json({
+    return res.status(404).json({
         success: false,
         message: 'Route not found',
         path: req.originalUrl,
@@ -619,7 +1407,7 @@ app.use('*', (req, res) => {
 // Error handler
 app.use((error, req, res, next) => {
     logger.error('Unhandled error:', error);
-    res.status(500).json({
+    return res.status(500).json({
         success: false,
         error: 'Internal server error',
         message: 'Something went wrong',

@@ -34,7 +34,7 @@ export interface AuthResponse {
 export interface CreateNFTRequest {
   name: string;
   description: string;
-  image: string;
+  imageUrl: string;  // Backend expects 'imageUrl', not 'image'
   attributes?: NFTAttribute[];
   external_url?: string;
   animation_url?: string;
@@ -81,6 +81,7 @@ export interface AccountNFTsResponse {
 
 export interface WalletInfoResponse {
   success: boolean;
+  message: string;
   data: {
     network: {
       network: string;
@@ -88,11 +89,85 @@ export interface WalletInfoResponse {
       walletAddress: string | null;
     };
     balance: {
-      balance: string;
-      available: string;
+      drops: string;
+      xrp: string;
     } | null;
+    connected: boolean;
+    clientConnected: boolean;
   };
+}
+
+export interface CreateWalletRequest {
+  name?: string;
+  description?: string;
+}
+
+export interface CreateWalletResponse {
+  success: boolean;
   message: string;
+  warning?: string;
+  timestamp: string;
+  data: {
+    address: string;
+    seed: string;
+    publicKey: string;
+    network: string;
+    databaseId: string;
+  };
+}
+
+export interface WalletListResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+  data: {
+    wallets: WalletInfo[];
+    count: number;
+    total: number;
+  };
+}
+
+export interface WalletInfo {
+  id: string;
+  address: string;
+  network: 'testnet' | 'mainnet' | 'devnet';
+  balance: string | null; // Balance in drops
+  balanceXRP: string | null; // Balance in XRP
+  isOwned: boolean;
+  isActive: boolean;
+  nickname?: string | null;
+  description?: string | null;
+  tags?: string[] | null;
+  createdAt: string;
+  updatedAt: string;
+  lastSyncAt?: string | null;
+  nftCount: {
+    owned: number;
+    issued: number;
+  };
+  // Only included if includeSecrets=true and wallet is owned
+  publicKey?: string | null;
+  hasSeed?: boolean | null;
+  hasPrivateKey?: boolean | null;
+}
+
+export interface FundWalletRequest {
+  address: string;
+  amount?: number; // XRP amount, defaults to 1000 for testnet
+}
+
+export interface FundWalletResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+  data: {
+    requestedAddress: string;
+    actualAddress: string;
+    balance: string; // Amount of XRP funded (e.g., "10")
+    network: string;
+    seed: string;
+    note: string;
+  };
 }
 
 export interface HealthResponse {
@@ -220,11 +295,171 @@ export interface NFTStatsResponse {
   data: {
     totalNFTs: number;
     totalAccounts: number;
+    recentMints: number; // Last 24 hours
     totalTransactions: number;
-    averageTransferFee: number;
-    lastUpdated: string;
   };
   message: string;
+}
+
+// New interfaces for updated API contracts
+
+export interface ValidateWalletResponse {
+  success: boolean;
+  data: {
+    address: string;
+    isValid: boolean;
+    network: string;
+  };
+  message: string;
+  timestamp: string;
+}
+
+export interface SyncBalanceResponse {
+  success: boolean;
+  data: {
+    address: string;
+    balance: {
+      drops: string;
+      xrp: string;
+    };
+    synced: boolean;
+  } | null;
+  error?: string;
+  message: string;
+  timestamp: string;
+}
+
+export interface SyncAllBalancesResponse {
+  success: boolean;
+  data: {
+    totalAccounts: number;
+    successCount: number;
+    errorCount: number;
+    results: Array<{
+      address: string;
+      success: boolean;
+      balance: string | null;
+      error: string | null;
+    }>;
+  };
+  message: string;
+  timestamp: string;
+}
+
+export interface WalletStatsResponse {
+  success: boolean;
+  data: {
+    totalWallets: number;
+    ownedWallets: number;
+    externalWallets: number;
+    activeWallets: number;
+    fundedWallets: number;
+    unfundedWallets: number;
+    networkDistribution: {
+      testnet: number;
+      mainnet: number;
+      devnet: number;
+    };
+    recentlyCreated: number; // Last 24 hours
+    recentlySynced: number; // Last hour
+  };
+  message: string;
+  timestamp: string;
+}
+
+// Songbird Cross-Chain Interfaces
+
+export interface SongbirdStatusResponse {
+  success: boolean;
+  data: {
+    connected: boolean;
+    network: string;
+    walletAddress: string;
+    contractAddress: string;
+    balance: string;
+  };
+  timestamp: string;
+}
+
+export interface WrapNFTRequest {
+  xrplNftId: string;
+  xrplOwnerAddress: string;
+  songbirdRecipientAddress: string;
+  metadata: {
+    name: string;
+    description: string;
+    image: string;
+    attributes: any[];
+  };
+}
+
+export interface WrapNFTResponse {
+  success: boolean;
+  data: {
+    songbirdTokenId: string;
+    transactionHash: string;
+    gasUsed: string;
+  };
+  message: string;
+  timestamp: string;
+}
+
+export interface UnwrapNFTRequest {
+  songbirdTokenId: string;
+}
+
+export interface UnwrapNFTResponse {
+  success: boolean;
+  data: {
+    xrplNftId: string;
+    transactionHash: string;
+    gasUsed: string;
+    owner: string;
+  };
+  message: string;
+  timestamp: string;
+}
+
+export interface WrappedNFTInfoResponse {
+  success: boolean;
+  data: {
+    xrplNftId: string;
+    isWrapped: boolean;
+    owner: string;
+    tokenURI: string;
+    metadata: any;
+  };
+  message: string;
+  timestamp: string;
+}
+
+export interface GasEstimateResponse {
+  success: boolean;
+  data: {
+    operation: string;
+    gasLimit: string;
+    gasPrice: string;
+    estimatedCost: string;
+  };
+  message: string;
+  timestamp: string;
+}
+
+export interface SongbirdWalletNFTsResponse {
+  success: boolean;
+  data: {
+    wallet: string;
+    nfts: Array<{
+      tokenId: string;
+      xrplNftId: string;
+      isWrapped: boolean;
+      tokenURI: string;
+      metadata: any;
+    }>;
+    count: number;
+  };
+  message: string;
+  timestamp: string;
 }
 
 @Injectable({
@@ -333,6 +568,78 @@ export class ApiService {
     });
   }
 
+  // Create a new XRPL wallet
+  createWallet(request: CreateWalletRequest = {}): Observable<CreateWalletResponse> {
+    return this.http.post<CreateWalletResponse>(`${this.baseUrl}/wallet/create`, request, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Get list of all wallets with optional parameters
+  getWalletList(limit?: number, includeSecrets: boolean = false): Observable<WalletListResponse> {
+    let params = new HttpParams();
+    if (limit) {
+      params = params.set('limit', limit.toString());
+    }
+    params = params.set('includeSecrets', includeSecrets.toString());
+
+    return this.http.get<WalletListResponse>(`${this.baseUrl}/wallet/list`, {
+      headers: this.getHeaders(),
+      params
+    });
+  }
+
+  // Fund a wallet with testnet XRP
+  fundWallet(request: FundWalletRequest): Observable<FundWalletResponse> {
+    return this.http.post<FundWalletResponse>(`${this.baseUrl}/wallet/fund`, request, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Get specific wallet details
+  getWalletDetails(address: string, includeSecrets: boolean = false): Observable<{success: boolean; data: WalletInfo; message: string; timestamp: string}> {
+    let params = new HttpParams().set('includeSecrets', includeSecrets.toString());
+    
+    return this.http.get<{success: boolean; data: WalletInfo; message: string; timestamp: string}>(`${this.baseUrl}/wallet/${address}`, {
+      headers: this.getHeaders(),
+      params
+    });
+  }
+
+  // Validate XRPL address format
+  validateWalletAddress(address: string): Observable<ValidateWalletResponse> {
+    return this.http.post<ValidateWalletResponse>(`${this.baseUrl}/wallet/validate`, 
+      { address }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // Sync wallet balance from XRPL
+  syncWalletBalance(address: string): Observable<SyncBalanceResponse> {
+    return this.http.post<SyncBalanceResponse>(
+      `${this.baseUrl}/wallet/sync-balance`, 
+      { address }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // Sync all wallet balances from XRPL
+  syncAllWalletBalances(): Observable<SyncAllBalancesResponse> {
+    return this.http.post<SyncAllBalancesResponse>(
+      `${this.baseUrl}/wallet/sync-all`, 
+      {}, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // Get wallet statistics
+  getWalletStatistics(): Observable<WalletStatsResponse> {
+    return this.http.get<WalletStatsResponse>(
+      `${this.baseUrl}/wallet/stats`, 
+      { headers: this.getHeaders() }
+    );
+  }
+
   // User Management (assuming these endpoints exist)
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/admin/users`, {
@@ -387,6 +694,50 @@ export class ApiService {
   // NFT Statistics - New endpoint from updated API spec
   getNFTStatistics(): Observable<NFTStatsResponse> {
     return this.http.get<NFTStatsResponse>(`${this.baseUrl}/stats/nft`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Songbird Cross-Chain Methods
+
+  // Get Songbird network status
+  getSongbirdStatus(): Observable<SongbirdStatusResponse> {
+    return this.http.get<SongbirdStatusResponse>(`${this.baseUrl}/songbird/status`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Wrap XRPL NFT to Songbird
+  wrapNFTToSongbird(request: WrapNFTRequest): Observable<WrapNFTResponse> {
+    return this.http.post<WrapNFTResponse>(`${this.baseUrl}/songbird/wrap`, request, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Unwrap Songbird NFT back to XRPL
+  unwrapNFTFromSongbird(request: UnwrapNFTRequest): Observable<UnwrapNFTResponse> {
+    return this.http.post<UnwrapNFTResponse>(`${this.baseUrl}/songbird/unwrap`, request, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Get wrapped NFT information
+  getWrappedNFTInfo(tokenId: string): Observable<WrappedNFTInfoResponse> {
+    return this.http.get<WrappedNFTInfoResponse>(`${this.baseUrl}/songbird/nft/${tokenId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Get gas estimates for Songbird operations
+  getSongbirdGasEstimate(operation: 'wrap' | 'unwrap'): Observable<GasEstimateResponse> {
+    return this.http.get<GasEstimateResponse>(`${this.baseUrl}/songbird/gas/${operation}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Get wallet's wrapped NFTs on Songbird
+  getSongbirdWalletNFTs(address: string): Observable<SongbirdWalletNFTsResponse> {
+    return this.http.get<SongbirdWalletNFTsResponse>(`${this.baseUrl}/songbird/wallet/${address}/nfts`, {
       headers: this.getHeaders()
     });
   }

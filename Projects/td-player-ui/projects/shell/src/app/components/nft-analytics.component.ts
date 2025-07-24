@@ -887,7 +887,8 @@ export class NftAnalyticsComponent implements OnInit {
     if (!this.walletInfo || !this.walletInfo.data.balance) {
       return 'N/A';
     }
-    return this.walletInfo.data.balance.balance;
+    // Balance structure: { drops: string; xrp: string; }
+    return this.walletInfo.data.balance.xrp || 'N/A';
   }
 
   private handleError(message: string, error: any) {

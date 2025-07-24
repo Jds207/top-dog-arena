@@ -51,6 +51,11 @@ export const routes: Routes = [
       import('./components/admin/nft-management.component').then((m) => m.NftManagementComponent),
   },
   {
+    path: 'admin/wallet-management',
+    loadComponent: () =>
+      import('./components/admin/wallet-management.component').then((m) => m.WalletManagementComponent),
+  },
+  {
     path: 'admin/user-management',
     loadComponent: () =>
       import('./components/admin/user-management.component').then((m) => m.UserManagementComponent),

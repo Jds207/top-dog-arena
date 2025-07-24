@@ -44,6 +44,18 @@ declare class XRPLService {
         available: string;
     }>;
     /**
+     * Get balance of any XRPL address in XRP (not drops)
+     */
+    getBalance(address: string): Promise<string>;
+    /**
+     * Send XRP from one address to another
+     */
+    sendXRP(fromAddress: string, toAddress: string, amount: string): Promise<{
+        success: boolean;
+        transactionHash?: string;
+        error?: string;
+    }>;
+    /**
      * Get account reserve requirements
      */
     getAccountReserve(): Promise<number>;
@@ -59,6 +71,29 @@ declare class XRPLService {
      * Get all NFTs owned by an account
      */
     getAccountNFTs(account: string): Promise<any[]>;
+    /**
+     * Create a new XRPL wallet
+     */
+    createWallet(): Promise<{
+        address: string;
+        seed: string;
+        publicKey: string;
+        privateKey: string;
+    }>;
+    /**
+     * Fund a wallet from testnet faucet (testnet only)
+     */
+    fundWallet(address: string): Promise<{
+        success: boolean;
+        balance?: string;
+        error?: string;
+        fundedAddress?: string;
+        fundedSeed?: string;
+    }>;
+    /**
+     * Check if an address is a valid XRPL address
+     */
+    isValidXRPLAddress(address: string): boolean;
     /**
      * Disconnect from XRPL
      */

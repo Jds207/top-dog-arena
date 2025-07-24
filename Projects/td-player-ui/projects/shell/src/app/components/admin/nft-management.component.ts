@@ -480,7 +480,7 @@ export class NftManagementComponent implements OnInit {
     const mintRequest: CreateNFTRequest = {
       name: formValue.name,
       description: formValue.description,
-      image: formValue.image || 'https://placeholder.com/300x300',
+      imageUrl: formValue.image || 'https://placeholder.com/300x300',  // Use imageUrl for backend
       attributes: formValue.attributes.filter((attr: any) => attr.trait_type && attr.value)
     };
 

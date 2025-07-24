@@ -88,6 +88,74 @@ class DatabaseService {
             throw error;
         }
     }
+    // Alias for createAccount to match server usage
+    async saveAccount(data) {
+        const accountData = {
+            address: data.address,
+            network: data.network || 'testnet',
+            publicKey: data.publicKey,
+            isOwned: data.isOwned || false,
+            nickname: data.nickname,
+            description: data.description,
+        };
+        // If metadata is provided, try to extract useful fields
+        if (data.metadata) {
+            if (data.metadata.publicKey && !accountData.publicKey) {
+                accountData.publicKey = data.metadata.publicKey;
+            }
+            // Store metadata as JSON in tags field for now
+            if (Object.keys(data.metadata).length > 0) {
+                accountData.description = accountData.description || JSON.stringify(data.metadata);
+            }
+        }
+        return this.createAccount(accountData);
+    }
+    async updateAccount(address, updates) {
+        try {
+            const updateData = {};
+            if (updates.nickname !== undefined)
+                updateData.nickname = updates.nickname;
+            if (updates.description !== undefined)
+                updateData.description = updates.description;
+            if (updates.tags !== undefined)
+                updateData.tags = updates.tags;
+            // Handle metadata by storing in tags field as JSON
+            if (updates.metadata) {
+                updateData.tags = JSON.stringify(updates.metadata);
+            }
+            const account = await this.prisma.account.update({
+                where: { address },
+                data: {
+                    ...updateData,
+                    updatedAt: new Date(),
+                },
+            });
+            logger_1.logger.info(`📝 Updated account: ${address}`);
+            return account;
+        }
+        catch (error) {
+            logger_1.logger.error(`❌ Failed to update account ${address}:`, error);
+            throw error;
+        }
+    }
+    async getAllAccounts(limit) {
+        try {
+            return await this.prisma.account.findMany({
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                take: limit,
+                include: {
+                    nftsOwned: true,
+                    nftsIssued: true,
+                },
+            });
+        }
+        catch (error) {
+            logger_1.logger.error('❌ Failed to get all accounts:', error);
+            throw error;
+        }
+    }
     // NFT management
     async createNFT(data) {
         try {
@@ -207,6 +275,22 @@ class DatabaseService {
         }
         catch (error) {
             logger_1.logger.error(`❌ Failed to update NFT owner:`, error);
+            throw error;
+        }
+    }
+    async updateNFTStatus(nftTokenID, updates) {
+        try {
+            await this.prisma.nFT.update({
+                where: { nftTokenID },
+                data: {
+                    ...updates,
+                    lastSyncAt: new Date(),
+                },
+            });
+            logger_1.logger.info(`🔄 Updated NFT ${nftTokenID} wrap status`);
+        }
+        catch (error) {
+            logger_1.logger.error(`❌ Failed to update NFT status:`, error);
             throw error;
         }
     }

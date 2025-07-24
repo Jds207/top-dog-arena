@@ -200,16 +200,16 @@ export declare const ErrorResponseSchema: z.ZodObject<{
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     error: string;
-    message: string;
     success: false;
+    message: string;
     details?: {
         message: string;
         field: string;
     }[] | undefined;
 }, {
     error: string;
-    message: string;
     success: false;
+    message: string;
     details?: {
         message: string;
         field: string;
@@ -220,12 +220,12 @@ export declare const SuccessResponseSchema: z.ZodObject<{
     data: z.ZodAny;
     message: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    message: string;
     success: true;
+    message: string;
     data?: any;
 }, {
-    message: string;
     success: true;
+    message: string;
     data?: any;
 }>;
 export type CreateNFTRequest = z.infer<typeof CreateNFTSchema>;

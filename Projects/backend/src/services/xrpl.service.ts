@@ -107,6 +107,84 @@ class XRPLService {
   }
 
   /**
+   * Get balance of any XRPL address in XRP (not drops)
+   */
+  async getBalance(address: string): Promise<string> {
+    if (!this.client) {
+      throw new Error('XRPL service not initialized');
+    }
+
+    try {
+      const response = await this.client.request({
+        command: 'account_info',
+        account: address,
+        ledger_index: 'validated'
+      });
+
+      const balanceDrops = response.result.account_data.Balance;
+      const balanceXRP = (parseInt(balanceDrops) / 1000000).toString(); // Convert drops to XRP
+      
+      return balanceXRP;
+    } catch (error) {
+      logger.error(`❌ Error getting balance for ${address}:`, error);
+      return '0'; // Return 0 if account doesn't exist or other error
+    }
+  }
+
+  /**
+   * Send XRP from one address to another
+   */
+  async sendXRP(fromAddress: string, toAddress: string, amount: string): Promise<{
+    success: boolean;
+    transactionHash?: string;
+    error?: string;
+  }> {
+    if (!this.client || !this.wallet) {
+      throw new Error('XRPL service not initialized');
+    }
+
+    // Only allow sending from our own wallet for security
+    if (fromAddress !== this.wallet.address) {
+      return {
+        success: false,
+        error: 'Can only send XRP from service wallet for security'
+      };
+    }
+
+    try {
+      const payment: any = {
+        TransactionType: 'Payment',
+        Account: fromAddress,
+        Amount: (parseFloat(amount) * 1000000).toString(), // Convert XRP to drops
+        Destination: toAddress
+      };
+
+      const prepared = await this.client.autofill(payment);
+      const signed = this.wallet.sign(prepared);
+      const result = await this.client.submitAndWait(signed.tx_blob);
+
+      if (result.result.meta && typeof result.result.meta !== 'string' && result.result.meta.TransactionResult === 'tesSUCCESS') {
+        logger.info(`💸 Sent ${amount} XRP from ${fromAddress} to ${toAddress}`);
+        return {
+          success: true,
+          transactionHash: signed.hash
+        };
+      } else {
+        return {
+          success: false,
+          error: 'Transaction failed'
+        };
+      }
+    } catch (error) {
+      logger.error('❌ Error sending XRP:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
    * Get account reserve requirements
    */
   async getAccountReserve(): Promise<number> {
@@ -239,6 +317,139 @@ class XRPLService {
     } catch (error) {
       logger.error(`❌ Failed to get NFTs for account ${account}:`, error);
       throw error;
+    }
+  }
+
+  /**
+   * Create a new XRPL wallet
+   */
+  async createWallet(): Promise<{
+    address: string;
+    seed: string;
+    publicKey: string;
+    privateKey: string;
+  }> {
+    try {
+      // Generate a new wallet
+      const newWallet = Wallet.generate();
+      
+      logger.info(`🏦 Generated new XRPL wallet: ${newWallet.address}`);
+      
+      return {
+        address: newWallet.address,
+        seed: newWallet.seed || '',
+        publicKey: newWallet.publicKey,
+        privateKey: newWallet.privateKey,
+      };
+    } catch (error) {
+      logger.error('❌ Error creating new wallet:', error);
+      throw new Error(`Failed to create wallet: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Fund a wallet from testnet faucet (testnet only)
+   */
+  async fundWallet(address: string): Promise<{
+    success: boolean;
+    balance?: string;
+    error?: string;
+    fundedAddress?: string;
+    fundedSeed?: string;
+  }> {
+    try {
+      if (this.config.network !== 'testnet') {
+        return {
+          success: false,
+          error: 'Wallet funding is only available on testnet'
+        };
+      }
+
+      // Ensure client is connected
+      if (!this.client) {
+        await this.initialize();
+      }
+
+      if (!this.client) {
+        return {
+          success: false,
+          error: 'Failed to connect to XRPL network'
+        };
+      }
+
+      // For now, just use the faucet method since it works reliably
+      logger.info(`💰 Using testnet faucet to fund wallet: ${address}`);
+      logger.info('🚀 ABOUT TO CALL FAUCET - Enhanced logging active');
+      const fundResult = await this.client.fundWallet();
+      logger.info('🎯 FAUCET CALL COMPLETED - Processing response');
+      
+      // Log the complete raw faucet response for debugging
+      logger.info(`🔍 FULL TESTNET FAUCET RESPONSE: ${JSON.stringify({
+        requestedAddress: address,
+        fullResponse: fundResult,
+        fundResultStringified: JSON.stringify(fundResult, null, 2)
+      }, null, 2)}`);
+      
+      if (fundResult?.wallet?.address) {
+        logger.info(`💰 Funded wallet ${fundResult.wallet.address} with ${fundResult.balance} XRP`);
+        
+        // Log wallet details for verification
+        logger.info(`✅ FUNDED WALLET DETAILS: ${JSON.stringify({
+          requestedAddress: address,
+          actualFundedAddress: fundResult.wallet.address,
+          balance: fundResult.balance?.toString(),
+          seed: fundResult.wallet.seed ? '[SEED PROVIDED]' : '[NO SEED]',
+          balanceDrops: fundResult.balance,
+          walletClassicAddress: fundResult.wallet.classicAddress,
+          walletPublicKey: fundResult.wallet.publicKey ? '[PUBLIC KEY PROVIDED]' : '[NO PUBLIC KEY]'
+        }, null, 2)}`);
+        
+        // Return the actual funded wallet address (not the requested one)
+        return {
+          success: true,
+          balance: fundResult.balance?.toString(),
+          fundedAddress: fundResult.wallet.address,
+          fundedSeed: fundResult.wallet.seed
+        };
+      } else {
+        logger.error(`❌ FAUCET FUNDING FAILED - No wallet in response: ${JSON.stringify({
+          requestedAddress: address,
+          fundResult: fundResult,
+          hasWallet: !!fundResult?.wallet,
+          hasAddress: !!fundResult?.wallet?.address
+        }, null, 2)}`);
+        return {
+          success: false,
+          error: 'Failed to fund wallet from faucet'
+        };
+      }
+      
+    } catch (error) {
+      logger.error(`❌ FAUCET ERROR - Complete error details: ${JSON.stringify({
+        requestedAddress: address,
+        error: error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
+        errorType: typeof error,
+        networkConfig: this.config.network
+      }, null, 2)}`);
+      return {
+        success: false,
+        error: `Failed to fund wallet: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Check if an address is a valid XRPL address
+   */
+  isValidXRPLAddress(address: string): boolean {
+    try {
+      // XRPL addresses start with 'r' and are 25-34 characters long
+      const addressRegex = /^r[1-9A-HJ-NP-Za-km-z]{24,33}$/;
+      return addressRegex.test(address);
+    } catch (error) {
+      return false;
     }
   }
 

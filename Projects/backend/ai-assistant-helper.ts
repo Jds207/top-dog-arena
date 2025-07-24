@@ -148,6 +148,85 @@ export class TopDogArenaAPI {
   }
 
   /**
+   * Create a new XRPL wallet
+   */
+  async createWallet(): Promise<ApiResponse<{
+    address: string;
+    seed: string;
+    publicKey: string;
+    network: string;
+    databaseId: string;
+  }>> {
+    return this.request('/wallet/create', {
+      method: 'POST',
+    });
+  }
+
+  /**
+   * Validate XRPL address format
+   */
+  async validateAddress(address: string): Promise<ApiResponse<{
+    address: string;
+    isValid: boolean;
+    network: string;
+  }>> {
+    return this.request('/wallet/validate', {
+      method: 'POST',
+      body: JSON.stringify({ address }),
+    });
+  }
+
+  /**
+   * Fund wallet from testnet faucet (testnet only)
+   */
+  async fundWallet(address: string): Promise<ApiResponse<{
+    address: string;
+    balance: string;
+    network: string;
+  }>> {
+    return this.request('/wallet/fund', {
+      method: 'POST',
+      body: JSON.stringify({ address }),
+    });
+  }
+
+  /**
+   * Sync wallet balance from XRPL network
+   */
+  async syncWalletBalance(address: string): Promise<ApiResponse<{
+    address: string;
+    balance: {
+      drops: string;
+      xrp: string;
+    };
+    synced: boolean;
+  }>> {
+    return this.request('/wallet/sync-balance', {
+      method: 'POST',
+      body: JSON.stringify({ address }),
+    });
+  }
+
+  /**
+   * Sync all wallet balances from XRPL network
+   */
+  async syncAllBalances(): Promise<ApiResponse<{
+    totalAccounts: number;
+    successCount: number;
+    errorCount: number;
+    results: Array<{
+      address: string;
+      success: boolean;
+      balance?: string;
+      error?: string;
+    }>;
+  }>> {
+    return this.request('/wallet/sync-all', {
+      method: 'POST',
+    });
+  }
+
+  /**
    * Create a single NFT
    */
   async createNFT(nftData: CreateNFTRequest): Promise<ApiResponse<NFTCreatedData>> {
@@ -233,7 +312,7 @@ export class TopDogArenaAPI {
 
     // Test XRPL status
     const xrplStatus = await this.getXRPLStatus();
-    results.xrpl = xrplStatus.success && xrplStatus.data?.xrpl?.connected;
+    results.xrpl = xrplStatus.success && (xrplStatus.data?.xrpl?.connected || false);
     results.details.xrpl = xrplStatus;
 
     // Test NFT service
@@ -259,6 +338,63 @@ export const examples = {
     console.log('NFT Service:', status.nftService ? '✅ Ready' : '⚠️ Not configured');
     
     return status;
+  },
+
+  /**
+   * Create a new wallet and sync all balances
+   */
+  async createAndSetupWallet() {
+    const api = new TopDogArenaAPI();
+    
+    // Create new wallet
+    const walletResult = await api.createWallet();
+    if (!walletResult.success) {
+      return { error: 'Failed to create wallet', details: walletResult };
+    }
+    
+    console.log(`🏦 Created wallet: ${walletResult.data?.address}`);
+    console.log(`🔑 Seed: ${walletResult.data?.seed}`); // Store securely!
+    
+    // Sync all balances to refresh database
+    const syncResult = await api.syncAllBalances();
+    console.log(`📊 Synced ${syncResult.data?.successCount}/${syncResult.data?.totalAccounts} wallets`);
+    
+    return {
+      wallet: walletResult.data,
+      syncStats: syncResult.data
+    };
+  },
+
+  /**
+   * Validate and potentially fund a wallet
+   */
+  async setupWalletForTesting(address: string) {
+    const api = new TopDogArenaAPI();
+    
+    // Validate address format
+    const validation = await api.validateAddress(address);
+    if (!validation.success || !validation.data?.isValid) {
+      return { error: 'Invalid XRPL address format' };
+    }
+    
+    // Check current balance
+    const balanceResult = await api.syncWalletBalance(address);
+    
+    if (balanceResult.success) {
+      console.log(`💰 Wallet has ${balanceResult.data?.balance.xrp} XRP`);
+      return { funded: true, balance: balanceResult.data?.balance };
+    } else {
+      console.log(`❌ Wallet unfunded, attempting to fund from testnet faucet...`);
+      
+      // Try to fund from testnet faucet
+      const fundResult = await api.fundWallet(address);
+      if (fundResult.success) {
+        console.log(`✅ Funded with ${fundResult.data?.balance} XRP`);
+        return { funded: true, fundedNow: true, balance: fundResult.data?.balance };
+      } else {
+        return { error: 'Failed to fund wallet', details: fundResult };
+      }
+    }
   },
 
   /**
@@ -315,8 +451,8 @@ export async function getAPISummary(): Promise<{
   const api = new TopDogArenaAPI();
   const tests = await api.runConnectivityTests();
   
-  const capabilities = [];
-  if (tests.api) capabilities.push('Health monitoring');
+  const capabilities: string[] = [];
+  if (tests.api) capabilities.push('Health monitoring', 'Wallet management');
   if (tests.xrpl) capabilities.push('XRPL integration', 'NFT creation');
   if (tests.nftService) capabilities.push('Wallet management', 'NFT queries');
   

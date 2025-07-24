@@ -12,32 +12,27 @@ This guide provides comprehensive information for AI assistants to interact with
 ### Essential Endpoints for AI Assistants
 
 ```bash
-# Check if API is online
-GET /api/health
-# Response: {"success": true, "message": "Top Dog Arena API is running"}
+# System Health & Status
+GET /api/health                  # Basic API status
+GET /api/health/detailed         # Detailed system status
+GET /api/health/xrpl            # XRPL connection status
 
-# Check system health (includes database status)
-GET /api/health/detailed
-# Shows API, XRPL, and database connection status
+# Wallet Management
+POST /api/wallet/create          # Create new XRPL wallet
+POST /api/wallet/validate        # Validate XRPL address format
+POST /api/wallet/fund           # Fund wallet from testnet faucet
+POST /api/wallet/sync-balance    # Sync single wallet balance
+POST /api/wallet/sync-all        # Sync all wallet balances
+GET /api/nft/wallet/info        # Get main wallet info
 
-# Get NFT statistics from database
-GET /api/stats/nft
-# Shows total NFTs, accounts, recent mints
+# NFT Operations
+POST /api/nft/create            # Create NFT (saves to XRPL + database)
+GET /api/nft/{nftId}            # Get NFT details from database
+GET /api/nft/account/{account}   # Get NFTs by owner account
 
-# Get wallet info with real balance
-GET /api/nft/wallet/info
-# Shows network, wallet, and XRP balance
-
-# Get NFT details from database
-GET /api/nft/{nftId}
-# Returns complete NFT data including blockchain info
-
-# Get NFTs by owner account
-GET /api/nft/account/{account}
-# Returns all NFTs owned by an XRPL address
-
-# Create NFT (saves to both XRPL and database)
-POST /api/nft/create
+# Statistics & Data
+GET /api/stats                  # General API statistics
+GET /api/stats/nft             # NFT-specific statistics
 ```
 
 ## 📋 API Status Interpretation
@@ -161,6 +156,124 @@ if (result.success) {
   console.log('❌ NFT creation failed:', result.error);
 }
 ```
+
+## 🏦 Wallet Management Guide
+
+The API provides comprehensive wallet management capabilities for AI assistants:
+
+### 1. **Create New XRPL Wallets**
+```javascript
+// Generate a new XRPL wallet
+const response = await fetch('/api/wallet/create', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' }
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log(`✅ New wallet created: ${result.data.address}`);
+  console.log(`🔑 Seed: ${result.data.seed}`); // STORE SECURELY!
+  console.log(`🆔 Database ID: ${result.data.databaseId}`);
+} else {
+  console.log('❌ Wallet creation failed:', result.error);
+}
+```
+
+### 2. **Validate XRPL Addresses**
+```javascript
+// Check if an address is valid
+const response = await fetch('/api/wallet/validate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ 
+    address: 'rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b' 
+  })
+});
+
+const result = await response.json();
+console.log(`Address valid: ${result.data.isValid}`);
+```
+
+### 3. **Fund Wallets (Testnet Only)**
+```javascript
+// Fund a wallet from testnet faucet
+const response = await fetch('/api/wallet/fund', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ 
+    address: 'rsDfKpwz1fm5C2g3ehHutvS55EfqjXwmkD' 
+  })
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log(`💰 Funded with ${result.data.balanceXRP} XRP (${result.data.balanceDrops} drops)`);
+  console.log(`🏦 Actual address: ${result.data.actualAddress}`);
+  console.log(`🔑 Seed: ${result.data.seed}`);
+} else {
+  console.log('❌ Funding failed:', result.error);
+}
+
+// Example successful response:
+// {
+//   "success": true,
+//   "data": {
+//     "requestedAddress": "rsDfKpwz1fm5C2g3ehHutvS55EfqjXwmkD",
+//     "actualAddress": "rBcXeXYok6AMw3VeRSR2KxUVPQnKJtbsm6",
+//     "balanceDrops": "10000000",
+//     "balanceXRP": "10.000000",
+//     "network": "testnet",
+//     "seed": "sEd7Cgw3oio33q74LWUSTzcSn8HPpvN",
+//     "note": "Testnet faucet created a new wallet instead of funding the requested address"
+//   }
+// }
+```
+
+### 4. **Sync Wallet Balances**
+```javascript
+// Sync single wallet balance from XRPL
+const response = await fetch('/api/wallet/sync-balance', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ 
+    address: 'rwiYXAA45LAg6GuMVm67owGtZC3tknbf4b' 
+  })
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log(`💰 Balance: ${result.data.balance.xrp} XRP`);
+} else {
+  console.log('❌ Account not found (unfunded)');
+}
+```
+
+### 5. **Sync All Wallet Balances**
+```javascript
+// Sync all wallets at once
+const response = await fetch('/api/wallet/sync-all', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' }
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log(`📊 Synced ${result.data.successCount}/${result.data.totalAccounts} wallets`);
+  result.data.results.forEach(wallet => {
+    if (wallet.success) {
+      console.log(`✅ ${wallet.address}: ${wallet.balance}`);
+    } else {
+      console.log(`❌ ${wallet.address}: ${wallet.error}`);
+    }
+  });
+}
+```
+
+### 🔑 Important Notes:
+- **Wallet Seeds**: Store securely! Cannot be recovered if lost
+- **Unfunded Wallets**: New wallets don't exist on XRPL until funded
+- **Testnet Faucets**: Only available on testnet for development
+- **Balance Sync**: "Not synced" means balance hasn't been fetched from XRPL yet
 
 ## 🔧 Configuration Requirements
 

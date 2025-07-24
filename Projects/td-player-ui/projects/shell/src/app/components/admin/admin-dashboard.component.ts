@@ -25,6 +25,12 @@ import { ApiService } from '../../services/api.service';
             <p>Create, mint, and manage NFTs on XRPL</p>
           </div>
 
+          <div class="admin-card" routerLink="/admin/wallet-management">
+            <div class="card-icon">💰</div>
+            <h3>Wallet Management</h3>
+            <p>Create and manage XRPL wallets</p>
+          </div>
+
           <div class="admin-card" routerLink="/admin/user-management">
             <div class="card-icon">👥</div>
             <h3>User Management</h3>

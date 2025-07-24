@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../services/api.service';
 
 interface XRPLAccount {
@@ -43,7 +43,7 @@ interface WalletConnection {
           </div>
           <div *ngIf="wallet.isConnected" class="connection-info">
             <p><strong>Address:</strong> <code>{{ wallet.address }}</code></p>
-            <p><strong>Balance:</strong> {{ wallet.balance }} XRP</p>
+            <p><strong>Balance:</strong> {{ formatBalance(wallet.balance) }} XRP</p>
             <p><strong>Connection Method:</strong> {{ getMethodDisplay(wallet.method) }}</p>
           </div>
         </div>
@@ -54,7 +54,8 @@ interface WalletConnection {
             <div class="indicator-dot" [class.active]="backendStatus === 'online'"></div>
             <span class="status-text">
               {{ backendStatus === 'checking' ? '🔄 Checking Backend...' : 
-                 backendStatus === 'online' ? '🟢 Backend API Online' : '🔴 Backend API Offline' }}
+                 backendStatus === 'online' ? '🟢 Backend API Online' : 
+                 backendStatus === 'error' ? '⚠️ Backend API Error' : '🔴 Backend API Offline' }}
             </span>
           </div>
           <div *ngIf="backendStatus === 'offline'" class="backend-info">
@@ -64,6 +65,34 @@ interface WalletConnection {
           </div>
           <div *ngIf="backendStatus === 'online'" class="backend-info">
             <p><strong>✅ Full API functionality available</strong></p>
+            <div *ngIf="nftStats" class="nft-stats-summary">
+              <p><strong>📊 NFT Collection Stats:</strong></p>
+              <div class="stats-grid">
+                <span>Total NFTs: <strong>{{ nftStats.totalNFTs }}</strong></span>
+                <span>Total Accounts: <strong>{{ nftStats.totalAccounts }}</strong></span>
+                <span>Transactions: <strong>{{ nftStats.totalTransactions }}</strong></span>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="backendStatus === 'error'" class="backend-info">
+            <p><strong>⚠️ Backend API Error:</strong> API is responding but with errors</p>
+          </div>
+        </div>
+
+        <!-- XRPL Status -->
+        <div class="xrpl-status" [class]="'status-' + xrplStatus">
+          <div class="status-indicator">
+            <div class="indicator-dot" [class.active]="xrplStatus === 'connected'"></div>
+            <span class="status-text">
+              {{ xrplStatus === 'checking' ? '🔄 Checking XRPL...' : 
+                 xrplStatus === 'connected' ? '🟢 XRPL Connected' : 
+                 xrplStatus === 'error' ? '⚠️ XRPL Connection Error' : '🔴 XRPL Disconnected' }}
+            </span>
+          </div>
+          <div class="xrpl-info">
+            <p *ngIf="xrplStatus === 'connected'"><strong>✅ Connected to Songbird Testnet</strong></p>
+            <p *ngIf="xrplStatus === 'disconnected'"><strong>⚠️ XRPL connection issues detected</strong></p>
+            <p *ngIf="xrplStatus === 'error'"><strong>❌ XRPL connection error</strong></p>
           </div>
         </div>
 
@@ -134,7 +163,7 @@ interface WalletConnection {
             <div class="info-card">
               <h3>Balance</h3>
               <div class="balance-display">
-                <span class="balance-amount">{{ accountInfo.balance }}</span>
+                <span class="balance-amount">{{ formatBalance(accountInfo.balance) }}</span>
                 <span class="balance-currency">XRP</span>
               </div>
             </div>
@@ -189,13 +218,33 @@ interface WalletConnection {
           </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div *ngIf="wallet.isConnected" class="quick-actions">
-          <h2>Quick Actions</h2>
-          <div class="actions-grid">
+        <!-- Admin Panel Access -->
+        <div class="admin-access">
+          <h2>Admin Panel</h2>
+          <p>Access the admin dashboard and NFT management tools</p>
+          <div class="admin-actions-grid">
+            <button routerLink="/admin" class="action-btn admin-dashboard">
+              🏠 Admin Dashboard
+            </button>
+            <button routerLink="/admin/wallet-management" class="action-btn wallet-management">
+              💰 Wallet Management
+            </button>
             <button routerLink="/admin/nft-management" class="action-btn mint">
               🎨 Mint NFT
             </button>
+            <button routerLink="/admin/api-tester" class="action-btn api-test">
+              🔧 API Tester
+            </button>
+            <button routerLink="/admin/xrpl-monitor" class="action-btn monitor">
+              📊 XRPL Monitor
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div *ngIf="wallet.isConnected" class="quick-actions">
+          <h2>Wallet Actions</h2>
+          <div class="actions-grid">
             <button (click)="refreshAccount()" class="action-btn refresh" [disabled]="refreshing">
               {{ refreshing ? '⏳' : '🔄' }} Refresh
             </button>
@@ -360,7 +409,7 @@ interface WalletConnection {
       border: 2px solid rgba(59, 130, 246, 0.5);
       border-radius: 12px;
       padding: 2rem;
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
       text-align: center;
       transition: all 0.3s ease;
     }
@@ -375,9 +424,72 @@ interface WalletConnection {
       background: rgba(239, 68, 68, 0.1);
     }
 
+    .backend-status.status-error {
+      border-color: rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
     .backend-status.status-checking {
       border-color: rgba(59, 130, 246, 0.5);
       background: rgba(59, 130, 246, 0.1);
+    }
+
+    .xrpl-status {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(139, 92, 246, 0.5);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .xrpl-status.status-connected {
+      border-color: rgba(34, 197, 94, 0.5);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .xrpl-status.status-disconnected {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .xrpl-status.status-error {
+      border-color: rgba(220, 38, 38, 0.5);
+      background: rgba(220, 38, 38, 0.1);
+    }
+
+    .xrpl-status.status-checking {
+      border-color: rgba(139, 92, 246, 0.5);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .xrpl-info {
+      text-align: left;
+      margin-top: 1rem;
+    }
+
+    .xrpl-info p {
+      margin: 0.5rem 0;
+    }
+
+    .nft-stats-summary {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .stats-grid span {
+      font-size: 0.9rem;
+      opacity: 0.9;
     }
 
     .backend-info {
@@ -530,6 +642,7 @@ interface WalletConnection {
     }
 
     .account-info,
+    .admin-access,
     .quick-actions,
     .network-info,
     .connection-tips {
@@ -542,11 +655,28 @@ interface WalletConnection {
     }
 
     .account-info h2,
+    .admin-access h2,
     .quick-actions h2,
     .network-info h2,
     .connection-tips h2 {
       margin: 0 0 1.5rem 0;
       color: #fbbf24;
+    }
+
+    .admin-access {
+      border-color: rgba(251, 191, 36, 0.3);
+      background: rgba(251, 191, 36, 0.05);
+    }
+
+    .admin-access p {
+      margin: 0 0 2rem 0;
+      opacity: 0.8;
+    }
+
+    .admin-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
     }
 
     .info-grid {
@@ -721,6 +851,11 @@ interface WalletConnection {
       color: white;
     }
 
+    .action-btn.wallet-management {
+      background: linear-gradient(45deg, #10b981, #059669);
+      color: white;
+    }
+
     .action-btn.refresh {
       background: linear-gradient(45deg, #3b82f6, #2563eb);
       color: white;
@@ -733,6 +868,21 @@ interface WalletConnection {
 
     .action-btn.test {
       background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+      color: white;
+    }
+
+    .action-btn.admin-dashboard {
+      background: linear-gradient(45deg, #fbbf24, #f59e0b);
+      color: white;
+    }
+
+    .action-btn.api-test {
+      background: linear-gradient(45deg, #06b6d4, #0891b2);
+      color: white;
+    }
+
+    .action-btn.monitor {
+      background: linear-gradient(45deg, #ec4899, #db2777);
       color: white;
     }
 
@@ -814,7 +964,8 @@ interface WalletConnection {
       }
 
       .info-grid,
-      .actions-grid {
+      .actions-grid,
+      .admin-actions-grid {
         grid-template-columns: 1fr;
       }
 
@@ -833,7 +984,7 @@ interface WalletConnection {
     }
   `]
 })
-export class XrplConnectComponent implements OnInit, OnDestroy {
+export class XrplConnectComponent implements OnInit {
   wallet: WalletConnection = {
     isConnected: false,
     address: null,
@@ -845,39 +996,75 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
   addressError = '';
   connecting = false;
   refreshing = false;
-  backendStatus: 'checking' | 'online' | 'offline' = 'checking';
+  backendStatus: 'checking' | 'online' | 'offline' | 'error' = 'checking';
+  xrplStatus: 'checking' | 'connected' | 'disconnected' | 'error' = 'checking';
+  nftStats: any = null;
 
   accountInfo: XRPLAccount | null = null;
   nfts: any[] = [];
   loadingNFTs = false;
   nftsLoaded = false;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    // Check backend status
+    // Check backend and XRPL status
     this.checkBackendStatus();
-    
-    // Check if there's a saved connection
-    const savedConnection = this.getSavedConnection();
-    if (savedConnection) {
-      this.wallet = savedConnection;
-      this.loadAccountInfo();
-    }
-  }
+    this.checkXRPLStatus();
+    this.loadNFTStatistics();
 
-  ngOnDestroy() {
-    // Save connection state
-    this.saveConnection();
+    // Check if an address was provided in the URL
+    this.route.queryParams.subscribe(params => {
+      if (params['address']) {
+        this.manualAddress = params['address'];
+        // Auto-connect if address provided
+        setTimeout(() => this.connectManual(), 1000);
+      }
+    });
   }
 
   async checkBackendStatus(): Promise<void> {
     try {
-      await this.apiService.checkAPIHealth().toPromise();
-      this.backendStatus = 'online';
+      const health = await this.apiService.checkAPIHealth().toPromise();
+      if (health?.success) {
+        this.backendStatus = 'online';
+        console.log('Backend health check passed:', health);
+      } else {
+        this.backendStatus = 'error';
+        console.warn('Backend health check failed:', health);
+      }
     } catch (error) {
       this.backendStatus = 'offline';
       console.warn('Backend API is not available:', error);
+    }
+  }
+
+  async checkXRPLStatus(): Promise<void> {
+    try {
+      const xrplHealth = await this.apiService.checkXRPLConnection().toPromise();
+      if (xrplHealth?.success && xrplHealth.xrpl?.connected) {
+        this.xrplStatus = 'connected';
+        console.log('XRPL connection healthy:', xrplHealth);
+      } else {
+        this.xrplStatus = 'disconnected';
+        console.warn('XRPL connection issue:', xrplHealth);
+      }
+    } catch (error) {
+      this.xrplStatus = 'error';
+      console.error('XRPL connection check failed:', error);
+    }
+  }
+
+  async loadNFTStatistics(): Promise<void> {
+    try {
+      const stats = await this.apiService.getNFTStatistics().toPromise();
+      if (stats?.success) {
+        this.nftStats = stats.data;
+        console.log('NFT statistics loaded:', this.nftStats);
+      }
+    } catch (error) {
+      console.warn('Failed to load NFT statistics:', error);
+      // Don't show error to user as this is supplementary data
     }
   }
 
@@ -886,19 +1073,31 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
     this.addressError = '';
   }
 
+  clearErrors(): void {
+    this.addressError = '';
+  }
+
   async connectManual(): Promise<void> {
     if (!this.manualAddress) return;
 
     this.connecting = true;
-    this.addressError = '';
+    this.clearErrors();
 
     try {
-      // Basic XRPL address validation
-      if (!this.isValidXRPLAddress(this.manualAddress)) {
-        throw new Error('Invalid XRPL address format');
+      // Validate address format using the API
+      try {
+        const validation = await this.apiService.validateWalletAddress(this.manualAddress).toPromise();
+        if (!validation?.data?.isValid) {
+          throw new Error(validation?.message || 'Invalid XRPL address format');
+        }
+      } catch (validationError: any) {
+        // Fall back to basic validation if API is not available
+        if (!this.isValidXRPLAddress(this.manualAddress)) {
+          throw new Error('Invalid XRPL address format');
+        }
       }
 
-      // Try to get account info from our API
+      // Get comprehensive account info from our enhanced API
       const accountData = await this.getAccountInfo(this.manualAddress);
       
       this.wallet = {
@@ -909,11 +1108,18 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
       };
 
       this.accountInfo = accountData;
-      this.saveConnection();
+      
+      // Load NFTs for the connected address
+      await this.loadNFTs();
+      
+      // Update status information
+      await this.checkBackendStatus();
+      await this.checkXRPLStatus();
 
+      console.log('Manual connection completed successfully for:', this.manualAddress);
     } catch (error: any) {
       this.addressError = error.message || 'Failed to connect to address';
-      console.error('Connection error:', error);
+      console.error('Manual connection error:', error);
     } finally {
       this.connecting = false;
     }
@@ -924,6 +1130,13 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
 
     this.refreshing = true;
     try {
+      // Refresh backend and XRPL status
+      await Promise.all([
+        this.checkBackendStatus(),
+        this.checkXRPLStatus(),
+        this.loadNFTStatistics()
+      ]);
+
       const accountData = await this.getAccountInfo(this.wallet.address);
       this.accountInfo = accountData;
       this.wallet.balance = accountData?.balance || '0';
@@ -934,6 +1147,7 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Failed to refresh account:', error);
+      this.addressError = 'Failed to refresh account information';
     } finally {
       this.refreshing = false;
     }
@@ -943,29 +1157,46 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
     if (!this.wallet.address) return;
 
     this.loadingNFTs = true;
+    this.addressError = ''; // Clear any previous errors
+    
     try {
+      console.log(`Loading NFTs for address: ${this.wallet.address}`);
       const response = await this.apiService.getAccountNFTs(this.wallet.address).toPromise();
+      
       if (response?.success && response.data) {
+        console.log('NFT response data:', response.data);
+        
         // Transform the XRPL NFT format to our display format
         this.nfts = response.data.nfts.map(nft => ({
           id: nft.NFTokenID,
           name: `NFT #${nft.nft_serial}`,
-          description: `NFT from ${nft.Issuer}`,
+          description: `Baseball Card NFT from ${nft.Issuer.slice(0, 10)}...`,
           tokenId: nft.NFTokenID,
           image: nft.URI ? this.decodeHexURI(nft.URI) : undefined,
           attributes: [
             { trait_type: 'Serial', value: nft.nft_serial.toString() },
             { trait_type: 'Taxon', value: nft.NFTokenTaxon.toString() },
-            { trait_type: 'Transfer Fee', value: `${nft.TransferFee / 1000}%` }
+            { trait_type: 'Transfer Fee', value: `${nft.TransferFee / 1000}%` },
+            { trait_type: 'Flags', value: nft.Flags.toString() }
           ]
         }));
+
+        console.log(`Loaded ${this.nfts.length} NFTs`);
       } else {
         this.nfts = [];
+        console.log('No NFTs found in response');
       }
+      
       this.nftsLoaded = true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load NFTs:', error);
       this.nfts = [];
+      this.addressError = `Failed to load NFTs: ${error.message || 'Unknown error'}`;
+      
+      // If it's a network error, suggest checking backend status
+      if (error.status === 0) {
+        this.addressError += ' (Check if backend is running)';
+      }
     } finally {
       this.loadingNFTs = false;
     }
@@ -999,37 +1230,96 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
     this.nftsLoaded = false;
     this.manualAddress = '';
     this.addressError = '';
-    this.clearSavedConnection();
   }
 
   private async getAccountInfo(address: string): Promise<XRPLAccount> {
     try {
-      // Try to get wallet info first - this gives us network and balance information
-      const walletInfo = await this.apiService.getWalletInfo().toPromise();
+      console.log(`Getting account info for address: ${address}`);
       
-      if (walletInfo?.success && walletInfo.data) {
-        const balance = walletInfo.data.balance;
-        return {
-          address: address,
-          balance: balance ? (parseInt(balance.balance) / 1000000).toString() : '0', // Convert drops to XRP
-          sequence: 0, // Not available from current API
-          ownerReserve: '2', // Standard XRPL reserve
-          reserve: '10' // Standard XRPL reserve
-        };
+      // Primary method: Get wallet details for the specific address
+      try {
+        console.log(`🔍 Calling API: http://localhost:3000/api/wallet/${address}`);
+        const walletDetails = await this.apiService.getWalletDetails(address).toPromise();
+        console.log(`📡 Raw API response for ${address}:`, walletDetails);
+        
+        if (walletDetails?.success && walletDetails.data) {
+          const walletData = walletDetails.data;
+          console.log(`💰 Full wallet data structure for ${address}:`, walletData);
+          
+          let balanceAmount = '0';
+          
+          // Check if balance is directly on the data object (new API format)
+          if (walletData.balance) {
+            if (typeof walletData.balance === 'string' || typeof walletData.balance === 'number') {
+              const parsedBalance = parseFloat(String(walletData.balance));
+              console.log(`🔢 Parsed balance directly from data.balance: ${parsedBalance}`);
+              if (!isNaN(parsedBalance)) {
+                balanceAmount = parsedBalance.toString();
+              }
+            } else if (typeof walletData.balance === 'object') {
+              // Handle nested balance object (old API format)
+              const balance = walletData.balance;
+              console.log(`� Balance object structure:`, balance);
+              
+              if ((balance as any).xrp) {
+                const parsedBalance = parseFloat((balance as any).xrp);
+                console.log(`🔢 Parsed balance from balance.xrp: ${parsedBalance}`);
+                if (!isNaN(parsedBalance)) {
+                  balanceAmount = parsedBalance.toString();
+                }
+              } else if ((balance as any).drops) {
+                const parsedBalance = parseFloat((balance as any).drops);
+                console.log(`🔢 Parsed balance from balance.drops: ${parsedBalance}`);
+                if (!isNaN(parsedBalance)) {
+                  // Convert drops to XRP (1 XRP = 1,000,000 drops)
+                  const xrpAmount = parsedBalance / 1000000;
+                  balanceAmount = xrpAmount.toString();
+                }
+              } else {
+                console.warn(`⚠️ No balance.xrp or balance.drops found. Balance object:`, balance);
+              }
+            }
+          } else {
+            console.warn(`⚠️ No balance property found on data object:`, walletData);
+          }
+          
+          console.log(`✅ Final balance amount for ${address}: ${balanceAmount}`);
+          
+          return {
+            address: address,
+            balance: balanceAmount,
+            sequence: 0, // Not available from current API
+            ownerReserve: '2', // Standard XRPL reserve
+            reserve: '10' // Standard XRPL reserve
+          };
+        } else {
+          console.warn(`❌ API response invalid or unsuccessful:`, walletDetails);
+        }
+      } catch (detailsError: any) {
+        console.warn(`Failed to get wallet details for ${address}:`, detailsError);
+        
+        // If it's a 404, the address might not exist or have no data
+        if (detailsError?.status === 404) {
+          throw new Error(`Wallet address ${address} not found or has no transaction history`);
+        }
+        
+        // If it's a network error, suggest checking backend
+        if (detailsError?.status === 0) {
+          throw new Error('Cannot connect to backend server. Please check if the server is running.');
+        }
+        
+        // For other errors, provide specific error message
+        throw new Error(`Failed to fetch data for address ${address}: ${detailsError?.message || 'Unknown error'}`);
       }
+
+      // If we reach here, the primary endpoint didn't return data but didn't throw an error either
+      throw new Error(`No data available for wallet address ${address}`);
       
-      throw new Error('No wallet info available');
     } catch (error) {
-      console.warn('Backend API call failed, using mock data for demonstration:', error);
+      console.error(`Failed to get account info for ${address}:`, error);
       
-      // Mock data for demonstration when backend is not available
-      return {
-        address: address,
-        balance: '100.50',
-        sequence: 12345,
-        ownerReserve: '10',
-        reserve: '20'
-      };
+      // Only show error, don't fall back to wrong address data
+      throw error;
     }
   }
 
@@ -1050,38 +1340,37 @@ export class XrplConnectComponent implements OnInit, OnDestroy {
     return /^r[a-zA-Z0-9]{24,34}$/.test(address);
   }
 
-  private getSavedConnection(): WalletConnection | null {
-    if (typeof localStorage === 'undefined') return null;
-    
-    const saved = localStorage.getItem('xrpl_connection');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (error) {
-        console.error('Failed to parse saved connection:', error);
-      }
-    }
-    return null;
-  }
-
-  private saveConnection(): void {
-    if (typeof localStorage === 'undefined') return;
-    
-    localStorage.setItem('xrpl_connection', JSON.stringify(this.wallet));
-  }
-
-  private clearSavedConnection(): void {
-    if (typeof localStorage === 'undefined') return;
-    
-    localStorage.removeItem('xrpl_connection');
-  }
-
   getMethodDisplay(method: string | null): string {
     switch (method) {
       case 'manual': return '📝 Manual Entry';
       case 'xumm': return '📱 Xumm Wallet';
       case 'metamask': return '🦊 MetaMask';
       default: return 'Unknown';
+    }
+  }
+
+  formatBalance(balance: string | null): string {
+    if (!balance || balance === '0') {
+      return '0';
+    }
+    
+    try {
+      const numBalance = parseFloat(balance);
+      if (isNaN(numBalance)) {
+        return '0';
+      }
+      
+      // If balance is larger than 1000, assume it's in drops and convert to XRP
+      if (numBalance > 1000) {
+        // Convert drops to XRP (1 XRP = 1,000,000 drops)
+        const xrpAmount = numBalance / 1000000;
+        return xrpAmount.toFixed(6).replace(/\.?0+$/, ''); // Remove trailing zeros
+      } else {
+        // Already in XRP format
+        return numBalance.toLocaleString();
+      }
+    } catch {
+      return balance || '0';
     }
   }
 }
